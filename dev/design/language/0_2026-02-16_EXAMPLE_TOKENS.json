@@ -1,0 +1,45 @@
+{
+  "color": {
+    "primary": "#667eea",
+    "primaryDark": "#764ba2",
+    "accent": "#f093fb",
+    "neutral50": "#f8fafc",
+    "neutral100": "#f1f5f9",
+    "neutral700": "#334155",
+    "neutral900": "#0f172a",
+    "success": "#4ade80",
+    "warning": "#fbbf24",
+    "error": "#f87171",
+    "info": "#22d3ee"
+  },
+  "spacing": {
+    "xs": "0.25rem",
+    "sm": "0.5rem",
+    "md": "1rem",
+    "lg": "1.5rem",
+    "xl": "2rem",
+    "2xl": "3rem"
+  },
+  "radius": {
+    "sm": "8px",
+    "md": "12px",
+    "lg": "16px",
+    "full": "9999px"
+  },
+  "shadow": {
+    "sm": "0 2px 8px rgba(0,0,0,0.08)",
+    "md": "0 4px 16px rgba(0,0,0,0.12)",
+    "lg": "0 8px 32px rgba(0,0,0,0.16)"
+  },
+  "typography": {
+    "fontFamily": "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+    "fontMono": "'JetBrains Mono', 'Fira Code', monospace",
+    "sizeXs": "0.75rem",
+    "sizeSm": "0.875rem",
+    "sizeMd": "1rem",
+    "sizeLg": "1.25rem",
+    "sizeXl": "1.5rem",
+    "size2xl": "2rem",
+    "size3xl": "3rem"
+  }
+}

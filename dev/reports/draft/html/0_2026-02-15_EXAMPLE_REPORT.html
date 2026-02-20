@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Example Report — Draft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      /* Primary */
+      --ps-orange-70: #ffaa64;
+      --ps-orange-60: #fa782e;
+      --ps-orange-50: #fe5000;
+      --ps-orange-40: #cc4000;
+      --ps-orange-30: #993000;
+
+      /* Neutrals */
+      --ps-white: #ffffff;
+      --ps-neutral-100: #f8f8f8;
+      --ps-neutral-90: #ededed;
+      --ps-neutral-80: #dadada;
+      --ps-neutral-30: #474747;
+      --ps-neutral-20: #2c2c2c;
+      --ps-neutral-10: #1c1c1c;
+      --ps-neutral-0: #0f0f0f;
+      --ps-black: #000000;
+
+      /* Canvas */
+      --ps-canvas-100: #faf7f1;
+      --ps-canvas-90: #f3ead8;
+      --ps-canvas-80: #e8dabf;
+
+      /* Secondary */
+      --ps-honey-50: #f9bc42;
+      --ps-raspberry-50: #e61363;
+      --ps-slate-50: #123c52;
+      --ps-ice-50: #b8edf7;
+
+      /* Feedback */
+      --ps-success: #61d365;
+      --ps-info: #3abdff;
+      --ps-notice: #f4e23f;
+      --ps-problem: #ec475e;
+
+      /* Gradients */
+      --ps-gradient-orange: linear-gradient(180deg, #fe5000 0%, #cc4000 100%);
+      --ps-gradient-dark: linear-gradient(180deg, #1c1c1c 0%, #000000 100%);
+      --ps-gradient-canvas: linear-gradient(180deg, #faf7f1 0%, #ffffff 100%);
+
+      /* Shadows */
+      --ps-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --ps-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
+      --ps-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+      /* Radius */
+      --ps-radius: 8px;
+      --ps-radius-lg: 12px;
+
+      /* Typography */
+      --ps-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--ps-font);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--ps-neutral-10);
+      background: var(--ps-neutral-100);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== LAYOUT ===== */
+    .report {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--ps-white);
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .report-header {
+      background: var(--ps-gradient-dark);
+      color: var(--ps-white);
+      padding: 48px 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .report-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--ps-gradient-orange);
+    }
+
+    .report-header .label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ps-orange-50);
+      margin-bottom: 16px;
+    }
+
+    .report-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .report-header .subtitle {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ps-neutral-80);
+      margin-bottom: 0;
+    }
+
+    /* ===== META BAR ===== */
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: 1px solid var(--ps-neutral-90);
+    }
+
+    .meta-item {
+      flex: 1 1 auto;
+      padding: 20px 24px;
+      border-right: 1px solid var(--ps-neutral-90);
+      min-width: 140px;
+    }
+
+    .meta-item:last-child { border-right: none; }
+
+    .meta-item .meta-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ps-neutral-30);
+      margin-bottom: 4px;
+    }
+
+    .meta-item .meta-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ps-neutral-10);
+    }
+
+    /* ===== STATUS BADGE ===== */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .badge--draft {
+      background: var(--ps-canvas-90);
+      color: var(--ps-orange-40);
+    }
+
+    .badge--published {
+      background: #e6f9e7;
+      color: #1a7a1e;
+    }
+
+    .badge--in-progress {
+      background: #e6f2ff;
+      color: #1a5fa8;
+    }
+
+    /* ===== CONTENT ===== */
+    .report-body {
+      padding: 40px 48px 64px;
+    }
+
+    .report-body h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ps-neutral-0);
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--ps-neutral-90);
+    }
+
+    .report-body h2:first-child { margin-top: 0; }
+
+    .report-body h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ps-neutral-10);
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    .report-body p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ps-neutral-20);
+      margin-bottom: 16px;
+    }
+
+    .report-body a {
+      color: var(--ps-orange-50);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .report-body a:hover { border-bottom-color: var(--ps-orange-50); }
+
+    /* ===== LISTS ===== */
+    .report-body ul, .report-body ol {
+      margin: 0 0 16px 0;
+      padding-left: 24px;
+    }
+
+    .report-body li {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ps-neutral-20);
+      margin-bottom: 6px;
+    }
+
+    .report-body li::marker { color: var(--ps-orange-50); }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--ps-white);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--ps-shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+
+    .card:hover { box-shadow: var(--ps-shadow-md); }
+
+    .card-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== STAT CARD ===== */
+    .stat-card {
+      background: var(--ps-gradient-canvas);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-card .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ps-orange-50);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-card .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ps-neutral-30);
+    }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight {
+      border-left: 4px solid var(--ps-orange-50);
+      background: var(--ps-canvas-100);
+      padding: 20px 24px;
+      border-radius: 0 var(--ps-radius) var(--ps-radius) 0;
+      margin: 24px 0;
+    }
+
+    .highlight p { margin-bottom: 0; }
+    .highlight p + p { margin-top: 8px; }
+
+    .highlight--info { border-left-color: var(--ps-info); background: #f0f8ff; }
+    .highlight--success { border-left-color: var(--ps-success); background: #f0fdf0; }
+    .highlight--warning { border-left-color: var(--ps-notice); background: #fffef0; }
+    .highlight--problem { border-left-color: var(--ps-problem); background: #fff5f5; }
+
+    /* ===== TABLE ===== */
+    .ps-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 15px;
+    }
+
+    .ps-table thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ps-neutral-30);
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--ps-neutral-90);
+      background: var(--ps-neutral-100);
+    }
+
+    .ps-table tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--ps-neutral-90);
+      color: var(--ps-neutral-20);
+      vertical-align: top;
+    }
+
+    .ps-table tbody tr:hover { background: var(--ps-canvas-100); }
+
+    .ps-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--ps-neutral-90);
+      border-radius: 100px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-bar .fill {
+      height: 100%;
+      background: var(--ps-gradient-orange);
+      border-radius: 100px;
+      transition: width 0.4s ease;
+    }
+
+    /* ===== CHECKLIST ===== */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--ps-neutral-90);
+      font-size: 15px;
+    }
+
+    .checklist li:last-child { border-bottom: none; }
+
+    .checklist .check {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 2px solid var(--ps-neutral-80);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      font-size: 12px;
+    }
+
+    .checklist .check--done {
+      background: var(--ps-orange-50);
+      border-color: var(--ps-orange-50);
+      color: var(--ps-white);
+    }
+
+    /* ===== DIVIDER ===== */
+    hr {
+      border: none;
+      height: 1px;
+      background: var(--ps-neutral-90);
+      margin: 32px 0;
+    }
+
+    /* ===== FOOTER ===== */
+    .report-footer {
+      padding: 24px 48px;
+      border-top: 1px solid var(--ps-neutral-90);
+      background: var(--ps-neutral-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--ps-neutral-30);
+    }
+
+    .report-footer .pure-mark {
+      font-weight: 800;
+      color: var(--ps-orange-50);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .report-header { padding: 32px 24px 28px; }
+      .report-header h1 { font-size: 26px; }
+      .report-body { padding: 28px 24px 48px; }
+      .report-footer { padding: 20px 24px; flex-direction: column; gap: 8px; }
+      .meta-bar { flex-direction: column; }
+      .meta-item { border-right: none; border-bottom: 1px solid var(--ps-neutral-90); }
+      .meta-item:last-child { border-bottom: none; }
+      .card-row { grid-template-columns: 1fr; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body { background: white; }
+      .report { box-shadow: none; }
+      .report-header { background: var(--ps-neutral-10) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card:hover { box-shadow: var(--ps-shadow-sm); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="report">
+
+  <!-- HEADER -->
+  <header class="report-header">
+    <span class="label">Internal Report</span>
+    <h1>Example Report Title</h1>
+    <p class="subtitle">A brief description of what this report covers and its purpose.</p>
+  </header>
+
+  <!-- META BAR -->
+  <div class="meta-bar">
+    <div class="meta-item">
+      <span class="meta-label">Report #</span>
+      <span class="meta-value">0</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Date</span>
+      <span class="meta-value">2026-02-15</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Author</span>
+      <span class="meta-value">Claude</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Status</span>
+      <span class="meta-value"><span class="badge badge--draft">Draft</span></span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <main class="report-body">
+
+    <h2>Summary</h2>
+    <p>This is an example draft report using the project design language. It demonstrates the available components and visual patterns for all future reports.</p>
+
+    <div class="highlight">
+      <p><strong>Key takeaway:</strong> Use this template as the starting point for all HTML reports. Components below can be mixed and matched as needed.</p>
+    </div>
+
+    <!-- STAT CARDS -->
+    <h2>Metrics Overview</h2>
+    <div class="card-row">
+      <div class="stat-card">
+        <div class="stat-value">42</div>
+        <div class="stat-label">Tasks Completed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">97%</div>
+        <div class="stat-label">Uptime</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3.2s</div>
+        <div class="stat-label">Avg Response</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <h3>Sprint Progress</h3>
+    <p>Current sprint is 72% complete.</p>
+    <div class="progress-bar"><div class="fill" style="width: 72%"></div></div>
+
+    <!-- TABLE -->
+    <h2>Details</h2>
+    <table class="ps-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Status</th>
+          <th>Owner</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Workspace scaffolding</td>
+          <td><span class="badge badge--published">Done</span></td>
+          <td>Claude</td>
+          <td>All directories and context docs created</td>
+        </tr>
+        <tr>
+          <td>Report template</td>
+          <td><span class="badge badge--in-progress">In Progress</span></td>
+          <td>Claude</td>
+          <td>project design language applied</td>
+        </tr>
+        <tr>
+          <td>First project onboarding</td>
+          <td><span class="badge badge--draft">Pending</span></td>
+          <td>Admin</td>
+          <td>Waiting for repo copy</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- HIGHLIGHT VARIANTS -->
+    <h2>Highlight Variants</h2>
+
+    <div class="highlight">
+      <p><strong>Default:</strong> General emphasis or key callouts. Uses Pure Orange accent.</p>
+    </div>
+
+    <div class="highlight highlight--info">
+      <p><strong>Info:</strong> Informational notes and context.</p>
+    </div>
+
+    <div class="highlight highlight--success">
+      <p><strong>Success:</strong> Completed items or positive outcomes.</p>
+    </div>
+
+    <div class="highlight highlight--warning">
+      <p><strong>Warning:</strong> Items that need attention or review.</p>
+    </div>
+
+    <div class="highlight highlight--problem">
+      <p><strong>Problem:</strong> Blockers, failures, or critical issues.</p>
+    </div>
+
+    <!-- CARD -->
+    <h2>Card Component</h2>
+    <div class="card">
+      <h3>Example Card</h3>
+      <p>Cards group related content with a subtle border and hover shadow. Use them for self-contained sections, summaries, or action items.</p>
+    </div>
+
+    <!-- CHECKLIST -->
+    <h2>Next Steps</h2>
+    <ul class="checklist">
+      <li>
+        <span class="check check--done">&#10003;</span>
+        <span>Initialize workspace directory structure</span>
+      </li>
+      <li>
+        <span class="check check--done">&#10003;</span>
+        <span>Create CLAUDE.md with project conventions</span>
+      </li>
+      <li>
+        <span class="check"></span>
+        <span>Onboard first project repository to _PROJECTS/</span>
+      </li>
+      <li>
+        <span class="check"></span>
+        <span>Generate first real report from project data</span>
+      </li>
+    </ul>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="report-footer">
+    <span><span class="pure-mark">PURE</span> Internal Report &mdash; Confidential</span>
+    <span>Generated 2026-02-15</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

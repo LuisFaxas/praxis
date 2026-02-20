@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Code Agents &amp; Skills — A Comprehensive Beginner's Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN TOKENS ===== */
+    :root {
+      --ps-orange-70: #ffaa64;
+      --ps-orange-60: #fa782e;
+      --ps-orange-50: #fe5000;
+      --ps-orange-40: #cc4000;
+      --ps-orange-30: #993000;
+      --ps-white: #ffffff;
+      --ps-neutral-100: #f8f8f8;
+      --ps-neutral-90: #ededed;
+      --ps-neutral-80: #dadada;
+      --ps-neutral-30: #474747;
+      --ps-neutral-20: #2c2c2c;
+      --ps-neutral-10: #1c1c1c;
+      --ps-neutral-0: #0f0f0f;
+      --ps-black: #000000;
+      --ps-canvas-100: #faf7f1;
+      --ps-canvas-90: #f3ead8;
+      --ps-canvas-80: #e8dabf;
+      --ps-honey-50: #f9bc42;
+      --ps-raspberry-50: #e61363;
+      --ps-slate-50: #123c52;
+      --ps-ice-50: #b8edf7;
+      --ps-success: #61d365;
+      --ps-info: #3abdff;
+      --ps-notice: #f4e23f;
+      --ps-problem: #ec475e;
+      --ps-gradient-orange: linear-gradient(180deg, #fe5000 0%, #cc4000 100%);
+      --ps-gradient-dark: linear-gradient(180deg, #1c1c1c 0%, #000000 100%);
+      --ps-gradient-canvas: linear-gradient(180deg, #faf7f1 0%, #ffffff 100%);
+      --ps-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --ps-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
+      --ps-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --ps-radius: 8px;
+      --ps-radius-lg: 12px;
+      --ps-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--ps-font);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--ps-neutral-10);
+      background: var(--ps-neutral-100);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== LAYOUT ===== */
+    .report { max-width: 900px; margin: 0 auto; background: var(--ps-white); min-height: 100vh; }
+
+    /* ===== HEADER ===== */
+    .report-header {
+      background: var(--ps-gradient-dark);
+      color: var(--ps-white);
+      padding: 48px 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--ps-gradient-orange);
+    }
+    .report-header .label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ps-orange-50);
+      margin-bottom: 16px;
+    }
+    .report-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .report-header .subtitle {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--ps-neutral-80);
+      margin-bottom: 0;
+    }
+
+    /* ===== META BAR ===== */
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      border-bottom: 1px solid var(--ps-neutral-90);
+    }
+    .meta-item {
+      flex: 1 1 auto;
+      padding: 20px 24px;
+      border-right: 1px solid var(--ps-neutral-90);
+      min-width: 140px;
+    }
+    .meta-item:last-child { border-right: none; }
+    .meta-item .meta-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ps-neutral-30);
+      margin-bottom: 4px;
+    }
+    .meta-item .meta-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ps-neutral-10);
+    }
+
+    /* ===== BADGES ===== */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .badge--draft { background: var(--ps-canvas-90); color: var(--ps-orange-40); }
+    .badge--published { background: #e6f9e7; color: #1a7a1e; }
+    .badge--in-progress { background: #e6f2ff; color: #1a5fa8; }
+
+    /* ===== CONTENT ===== */
+    .report-body { padding: 40px 48px 64px; }
+    .report-body h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ps-neutral-0);
+      margin-top: 40px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--ps-neutral-90);
+    }
+    .report-body h2:first-child { margin-top: 0; }
+    .report-body h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ps-neutral-10);
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+    .report-body h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ps-neutral-20);
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    .report-body p {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ps-neutral-20);
+      margin-bottom: 16px;
+    }
+    .report-body a {
+      color: var(--ps-orange-50);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .report-body a:hover { border-bottom-color: var(--ps-orange-50); }
+
+    /* ===== LISTS ===== */
+    .report-body ul, .report-body ol {
+      margin: 0 0 16px 0;
+      padding-left: 24px;
+    }
+    .report-body li {
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--ps-neutral-20);
+      margin-bottom: 6px;
+    }
+    .report-body li::marker { color: var(--ps-orange-50); }
+
+    /* ===== CARDS ===== */
+    .card {
+      background: var(--ps-white);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: var(--ps-shadow-sm);
+      transition: box-shadow 0.2s;
+    }
+    .card:hover { box-shadow: var(--ps-shadow-md); }
+    .card-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    /* ===== STAT CARD ===== */
+    .stat-card {
+      background: var(--ps-gradient-canvas);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-card .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--ps-orange-50);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-card .stat-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ps-neutral-30);
+    }
+
+    /* ===== HIGHLIGHT BOX ===== */
+    .highlight {
+      border-left: 4px solid var(--ps-orange-50);
+      background: var(--ps-canvas-100);
+      padding: 20px 24px;
+      border-radius: 0 var(--ps-radius) var(--ps-radius) 0;
+      margin: 24px 0;
+    }
+    .highlight p { margin-bottom: 0; }
+    .highlight p + p { margin-top: 8px; }
+    .highlight--info { border-left-color: var(--ps-info); background: #f0f8ff; }
+    .highlight--success { border-left-color: var(--ps-success); background: #f0fdf0; }
+    .highlight--warning { border-left-color: var(--ps-notice); background: #fffef0; }
+    .highlight--problem { border-left-color: var(--ps-problem); background: #fff5f5; }
+
+    /* ===== TABLE ===== */
+    .ps-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 15px;
+    }
+    .ps-table thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ps-neutral-30);
+      padding: 12px 16px;
+      border-bottom: 2px solid var(--ps-neutral-90);
+      background: var(--ps-neutral-100);
+    }
+    .ps-table tbody td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--ps-neutral-90);
+      color: var(--ps-neutral-20);
+      vertical-align: top;
+    }
+    .ps-table tbody tr:hover { background: var(--ps-canvas-100); }
+    .ps-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ===== CHECKLIST ===== */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--ps-neutral-90);
+      font-size: 15px;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist .check {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 2px solid var(--ps-neutral-80);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      font-size: 12px;
+    }
+    .checklist .check--done {
+      background: var(--ps-orange-50);
+      border-color: var(--ps-orange-50);
+      color: var(--ps-white);
+    }
+
+    /* ===== CODE ===== */
+    pre {
+      background: var(--ps-neutral-100);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 20px 24px;
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 14px;
+    }
+    p code, li code, td code {
+      background: var(--ps-neutral-100);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 13px;
+      color: var(--ps-orange-40);
+    }
+
+    /* ===== DIVIDER ===== */
+    hr { border: none; height: 1px; background: var(--ps-neutral-90); margin: 32px 0; }
+
+    /* ===== TOC ===== */
+    .toc {
+      background: var(--ps-neutral-100);
+      border: 1px solid var(--ps-neutral-90);
+      border-radius: var(--ps-radius);
+      padding: 24px 28px;
+      margin: 0 0 32px;
+    }
+    .toc-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ps-neutral-30);
+      margin-bottom: 12px;
+    }
+    .toc ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .toc li {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--ps-neutral-20);
+      margin-bottom: 0;
+    }
+    .toc a {
+      color: var(--ps-neutral-10);
+      text-decoration: none;
+      font-weight: 600;
+      border-bottom: none;
+    }
+    .toc a:hover { color: var(--ps-orange-50); }
+
+    /* ===== ANALOGY BOX ===== */
+    .analogy {
+      background: var(--ps-canvas-100);
+      border: 1px solid var(--ps-canvas-80);
+      border-radius: var(--ps-radius);
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+    .analogy-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ps-orange-50);
+      margin-bottom: 8px;
+    }
+
+    /* ===== FOOTER ===== */
+    .report-footer {
+      padding: 24px 48px;
+      border-top: 1px solid var(--ps-neutral-90);
+      background: var(--ps-neutral-100);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      color: var(--ps-neutral-30);
+    }
+    .report-footer .pure-mark { font-weight: 800; color: var(--ps-orange-50); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 640px) {
+      .report-header { padding: 32px 24px 28px; }
+      .report-header h1 { font-size: 26px; }
+      .report-body { padding: 28px 24px 48px; }
+      .report-footer { padding: 20px 24px; flex-direction: column; gap: 8px; }
+      .meta-bar { flex-direction: column; }
+      .meta-item { border-right: none; border-bottom: 1px solid var(--ps-neutral-90); }
+      .meta-item:last-child { border-bottom: none; }
+      .card-row { grid-template-columns: 1fr; }
+    }
+
+    /* ===== PRINT ===== */
+    @media print {
+      body { background: white; }
+      .report { box-shadow: none; }
+      .report-header { background: var(--ps-neutral-10) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card:hover { box-shadow: var(--ps-shadow-sm); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="report">
+
+  <!-- HEADER -->
+  <header class="report-header">
+    <span class="label">Technical Guide</span>
+    <h1>Claude Code Agents &amp; Skills</h1>
+    <p class="subtitle">A comprehensive beginner's guide to extending Claude Code with reusable skills, specialized agents, lifecycle hooks, and MCP integrations.</p>
+  </header>
+
+  <!-- META BAR -->
+  <div class="meta-bar">
+    <div class="meta-item">
+      <span class="meta-label">Report #</span>
+      <span class="meta-value">1</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Date</span>
+      <span class="meta-value">2026-02-15</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Author</span>
+      <span class="meta-value">Claude</span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Status</span>
+      <span class="meta-value"><span class="badge badge--draft">Draft</span></span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <main class="report-body">
+
+    <!-- SUMMARY -->
+    <div class="highlight">
+      <p><strong>Summary:</strong> This report explains how Claude Code's agents and skills systems work, what they are, how to create and use them, and the best practices that position you at the leading edge of AI-assisted development. Written for someone encountering these concepts for the first time, with analogies, real examples, and step-by-step guides.</p>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div class="toc">
+      <div class="toc-title">Table of Contents</div>
+      <ol>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#what-are-skills">What Are Skills?</a></li>
+        <li><a href="#creating-your-first-skill">Creating Your First Skill</a></li>
+        <li><a href="#skill-anatomy">Skill Anatomy &mdash; The SKILL.md File</a></li>
+        <li><a href="#how-skills-get-invoked">How Skills Get Invoked</a></li>
+        <li><a href="#what-are-agents">What Are Agents?</a></li>
+        <li><a href="#built-in-agents">Built-In Agent Types</a></li>
+        <li><a href="#custom-agents">Creating Custom Agents</a></li>
+        <li><a href="#orchestration">Agent Orchestration</a></li>
+        <li><a href="#hooks">Hooks &mdash; Automating the Lifecycle</a></li>
+        <li><a href="#mcp">MCP Servers &mdash; Extending Claude's Reach</a></li>
+        <li><a href="#best-practices">Best Practices</a></li>
+        <li><a href="#pitfalls">Common Pitfalls</a></li>
+        <li><a href="#getting-started">Getting Started &mdash; Your First 30 Minutes</a></li>
+        <li><a href="#sources">Sources</a></li>
+      </ol>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="card-row">
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Key Concepts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">5</div>
+        <div class="stat-label">Built-In Agent Types</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">8</div>
+        <div class="stat-label">Hook Events</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">30m</div>
+        <div class="stat-label">Time to Get Started</div>
+      </div>
+    </div>
+
+    <!-- ===== OVERVIEW ===== -->
+    <h2 id="overview">Overview</h2>
+
+    <p>Imagine you hired a brilliant assistant who can read your codebase, search the web, write code, run commands, and generate reports. That's Claude Code. But right now, every time you ask it to do something, you're giving instructions from scratch &mdash; like calling a contractor and explaining the job specs every single time.</p>
+
+    <p><strong>Skills</strong> and <strong>agents</strong> fix that.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">Analogy</div>
+      <p><strong>Skills</strong> are like <strong>recipes</strong> &mdash; reusable instruction sets that tell Claude <em>how</em> to do a specific task consistently. Instead of explaining "search the codebase, write a markdown report with these sections, save it here..." every time, you write it once as a skill and invoke it with <code>/report</code>.</p>
+      <p style="margin-top: 12px;"><strong>Agents</strong> are like <strong>specialized team members</strong> &mdash; each with their own expertise, tools, and context. A security reviewer agent, an explorer agent, a code improver agent. You can send them out to work in parallel, like dispatching scouts in different directions and having them report back.</p>
+    </div>
+
+    <p>Together, they transform Claude Code from a general-purpose assistant into a <strong>customized, repeatable workflow engine</strong>.</p>
+
+    <!-- ===== WHAT ARE SKILLS ===== -->
+    <h2 id="what-are-skills">What Are Skills?</h2>
+
+    <p>A skill is a markdown file that contains instructions for Claude. When you type <code>/skill-name</code> in Claude Code, it loads that file and follows the instructions &mdash; like opening a recipe card before cooking.</p>
+
+    <h3>The Recipe Analogy</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Recipe Card</th><th>Skill</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Recipe name</td><td>Skill name (e.g., <code>report</code>)</td></tr>
+        <tr><td>"When to make this dish"</td><td>Description field &mdash; tells Claude when to use it</td></tr>
+        <tr><td>Ingredient list</td><td><code>allowed-tools</code> &mdash; what Claude can use</td></tr>
+        <tr><td>Step-by-step instructions</td><td>The markdown body &mdash; what Claude should do</td></tr>
+        <tr><td>"Serves 4"</td><td><code>argument-hint</code> &mdash; what input the user provides</td></tr>
+        <tr><td>Stored in recipe binder</td><td>Stored in <code>.claude/skills/skill-name/SKILL.md</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Where Skills Live</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Scope</th><th>Path</th><th>Who Can Use It</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Personal</strong></td><td><code>~/.claude/skills/my-skill/SKILL.md</code></td><td>You, across all projects</td></tr>
+        <tr><td><strong>Project</strong></td><td><code>.claude/skills/my-skill/SKILL.md</code></td><td>Anyone working in this project</td></tr>
+        <tr><td><strong>Enterprise</strong></td><td>Managed settings (admin-controlled)</td><td>Everyone in the organization</td></tr>
+      </tbody>
+    </table>
+
+    <h3>What Skills Are Good For</h3>
+    <ul>
+      <li><strong>Repeatable workflows</strong> &mdash; "Generate a report," "Review this PR," "Fix this GitHub issue"</li>
+      <li><strong>Consistent output</strong> &mdash; Every report follows the same structure, every review covers the same checklist</li>
+      <li><strong>Domain knowledge</strong> &mdash; "Our API conventions," "Our error handling patterns," "Our design system"</li>
+      <li><strong>Complex multi-step tasks</strong> &mdash; "Deploy to staging," "Create a new component with tests"</li>
+    </ul>
+
+    <!-- ===== CREATING YOUR FIRST SKILL ===== -->
+    <h2 id="creating-your-first-skill">Creating Your First Skill</h2>
+
+    <h3>Step 1 &mdash; Create the directory</h3>
+    <pre><code>mkdir -p .claude/skills/explain-code</code></pre>
+
+    <h3>Step 2 &mdash; Write the SKILL.md</h3>
+    <p>Create <code>.claude/skills/explain-code/SKILL.md</code>:</p>
+    <pre><code>---
+name: explain-code
+description: Explains code with analogies and diagrams.
+argument-hint: [file-or-function]
+---
+
+When explaining code, follow this structure:
+
+1. Start with an analogy
+2. Draw a diagram (ASCII art)
+3. Walk through line by line
+4. Highlight a gotcha</code></pre>
+
+    <h3>Step 3 &mdash; Use it</h3>
+    <pre><code>/explain-code pages/api/token.js</code></pre>
+
+    <div class="highlight highlight--success">
+      <p><strong>That's it.</strong> Claude reads your skill file, applies its instructions, and explains the code using analogies and diagrams &mdash; every single time, consistently.</p>
+    </div>
+
+    <!-- ===== SKILL ANATOMY ===== -->
+    <h2 id="skill-anatomy">Skill Anatomy &mdash; The SKILL.md File</h2>
+
+    <p>Every skill has two parts: <strong>frontmatter</strong> (the metadata between <code>---</code> markers) and <strong>body</strong> (the instructions in markdown).</p>
+
+    <h3>Frontmatter Fields</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Field</th><th>Required</th><th>What It Does</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>name</code></td><td>No</td><td>The name you type after <code>/</code>. Defaults to folder name.</td></tr>
+        <tr><td><code>description</code></td><td>Recommended</td><td>Claude reads this to decide when to auto-invoke the skill.</td></tr>
+        <tr><td><code>argument-hint</code></td><td>No</td><td>Shows <code>[hint]</code> in autocomplete so users know what to type.</td></tr>
+        <tr><td><code>disable-model-invocation</code></td><td>No</td><td>When <code>true</code>, only you can invoke it. Use for destructive ops.</td></tr>
+        <tr><td><code>user-invocable</code></td><td>No</td><td>When <code>false</code>, hides from <code>/</code> menu. Only Claude uses it.</td></tr>
+        <tr><td><code>allowed-tools</code></td><td>No</td><td>Restricts tools. E.g., <code>Read, Grep</code> makes it read-only.</td></tr>
+        <tr><td><code>model</code></td><td>No</td><td>Force <code>sonnet</code>, <code>opus</code>, or <code>haiku</code>.</td></tr>
+        <tr><td><code>context</code></td><td>No</td><td>Set to <code>fork</code> to run in an isolated subagent context.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Dynamic Variables</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Variable</th><th>Expands To</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>$ARGUMENTS</code></td><td>Everything typed after <code>/skill-name</code></td></tr>
+        <tr><td><code>$0</code>, <code>$1</code>, <code>$2</code></td><td>Individual arguments by position</td></tr>
+        <tr><td><code>${CLAUDE_SESSION_ID}</code></td><td>Unique session identifier</td></tr>
+        <tr><td><code>!`command`</code></td><td>Output of a shell command (runs before Claude sees the prompt)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Shell Command Injection</h3>
+    <div class="analogy">
+      <div class="analogy-label">Analogy</div>
+      <p>It's like a chef who gets <strong>fresh ingredients delivered to the prep station</strong> before starting the recipe. The <code>!`command`</code> syntax runs shell commands first, and Claude sees the <em>results</em>, not the commands.</p>
+    </div>
+    <pre><code>---
+name: pr-review
+description: Review the current pull request
+---
+
+## PR Context (injected live)
+- PR diff: !`gh pr diff`
+- Changed files: !`gh pr diff --name-only`
+
+Review the changes above for quality and security.</code></pre>
+
+    <!-- ===== HOW SKILLS GET INVOKED ===== -->
+    <h2 id="how-skills-get-invoked">How Skills Get Invoked</h2>
+
+    <h3>1. User-Invoked (You Type It)</h3>
+    <pre><code>/report agents and skills
+/fix-issue 123
+/explain-code src/auth/login.ts</code></pre>
+
+    <h3>2. Auto-Invoked (Claude Triggers It)</h3>
+    <p>Claude reads the <code>description</code> field of every skill and decides whether to load one based on your message.</p>
+
+    <table class="ps-table">
+      <thead>
+        <tr><th>Setting</th><th>You Can Invoke</th><th>Claude Can Invoke</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Default (no flags)</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td><code>disable-model-invocation: true</code></td><td>Yes</td><td>No</td></tr>
+        <tr><td><code>user-invocable: false</code></td><td>No</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight highlight--info">
+      <p><strong>Rule of thumb:</strong> Auto-invoke for knowledge/reference skills. Manual-only (<code>disable-model-invocation: true</code>) for action skills like deploy, commit, or report generation.</p>
+    </div>
+
+    <!-- ===== WHAT ARE AGENTS ===== -->
+    <h2 id="what-are-agents">What Are Agents?</h2>
+
+    <p>If skills are recipes, agents are <strong>sous-chefs</strong> &mdash; specialized assistants that work under the head chef (your main Claude Code session).</p>
+
+    <div class="analogy">
+      <div class="analogy-label">The Kitchen Analogy</div>
+      <table class="ps-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Kitchen</th><th>Claude Code</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Head chef (you + main Claude)</td><td>Your main conversation</td></tr>
+          <tr><td>Sous-chef specializing in sauces</td><td>Explore agent (fast codebase search)</td></tr>
+          <tr><td>Sous-chef specializing in pastry</td><td>Plan agent (designing approaches)</td></tr>
+          <tr><td>Line cook who can do anything</td><td>General-purpose agent (multi-step tasks)</td></tr>
+          <tr><td>Sending a sous-chef to the pantry</td><td>Spawning a subagent with the Task tool</td></tr>
+          <tr><td>Getting the dish back</td><td>Subagent returns results to main conversation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== BUILT-IN AGENTS ===== -->
+    <h2 id="built-in-agents">Built-In Agent Types</h2>
+
+    <div class="card-row">
+      <div class="card">
+        <h3 style="margin-top: 0;">Explore Agent</h3>
+        <p><strong>Model:</strong> Haiku (fast)</p>
+        <p><strong>Tools:</strong> Read-only</p>
+        <p style="margin-bottom: 0;">Like sending a <strong>scout</strong> ahead to survey the terrain. Fast codebase discovery without modification.</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top: 0;">Plan Agent</h3>
+        <p><strong>Model:</strong> Inherited</p>
+        <p><strong>Tools:</strong> Read-only</p>
+        <p style="margin-bottom: 0;">Like an <strong>architect</strong> surveying a building before drawing blueprints. Research and design, no implementation.</p>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="card">
+        <h3 style="margin-top: 0;">General-Purpose Agent</h3>
+        <p><strong>Model:</strong> Inherited</p>
+        <p><strong>Tools:</strong> All tools</p>
+        <p style="margin-bottom: 0;">Like a <strong>full-stack contractor</strong> &mdash; reads blueprints, writes code, runs tests, ships results.</p>
+      </div>
+      <div class="card">
+        <h3 style="margin-top: 0;">Bash Agent</h3>
+        <p><strong>Model:</strong> Inherited</p>
+        <p><strong>Tools:</strong> Bash only</p>
+        <p style="margin-bottom: 0;">Isolated <strong>terminal context</strong> for running builds, tests, and git operations.</p>
+      </div>
+    </div>
+
+    <!-- ===== CUSTOM AGENTS ===== -->
+    <h2 id="custom-agents">Creating Custom Agents</h2>
+
+    <h3>File Locations</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Scope</th><th>Path</th><th>Shared?</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Personal</td><td><code>~/.claude/agents/name.md</code></td><td>No &mdash; just you</td></tr>
+        <tr><td>Project</td><td><code>.claude/agents/name.md</code></td><td>Yes &mdash; commit to repo</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Example: Security Reviewer</h3>
+    <pre><code>---
+name: security-reviewer
+description: Security specialist. Use proactively after code changes.
+tools: Read, Grep, Glob, Bash
+model: sonnet
+---
+
+You are a senior security engineer reviewing code.
+
+When invoked:
+1. Run git diff to see recent changes
+2. Check for OWASP Top 10 vulnerabilities
+3. Look for hardcoded secrets, SQL injection, XSS
+4. Report findings with severity ratings</code></pre>
+
+    <h3>Agent vs. Skill &mdash; When to Use Which</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Use Case</th><th>Skill</th><th>Agent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Consistent output format (reports, docs)</td><td>Yes</td><td>&mdash;</td></tr>
+        <tr><td>Specialized expertise (security, perf)</td><td>&mdash;</td><td>Yes</td></tr>
+        <tr><td>User types a command (<code>/something</code>)</td><td>Yes</td><td>&mdash;</td></tr>
+        <tr><td>Claude auto-delegates based on task</td><td>&mdash;</td><td>Yes</td></tr>
+        <tr><td>Reusable instructions for a task</td><td>Yes</td><td>&mdash;</td></tr>
+        <tr><td>Reusable persona for ongoing work</td><td>&mdash;</td><td>Yes</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ===== ORCHESTRATION ===== -->
+    <h2 id="orchestration">Agent Orchestration &mdash; Parallel vs. Sequential</h2>
+
+    <div class="card-row">
+      <div class="card">
+        <h3 style="margin-top: 0;">Parallel</h3>
+        <p>Send multiple agents out at the same time when tasks are independent.</p>
+        <div class="analogy" style="margin-bottom: 0;">
+          <div class="analogy-label">Analogy</div>
+          <p>Three scouts heading in different directions &mdash; north, south, east. They don't wait for each other.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top: 0;">Sequential</h3>
+        <p>Chain agents when one needs the output of another.</p>
+        <div class="analogy" style="margin-bottom: 0;">
+          <div class="analogy-label">Analogy</div>
+          <p>A relay race &mdash; the first runner finishes and passes the baton to the next.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight highlight--info">
+      <p><strong>Background agents:</strong> Press <code>Ctrl+B</code> to send a task to the background. Claude pre-approves permissions and runs independently, notifying you when done.</p>
+    </div>
+
+    <!-- ===== HOOKS ===== -->
+    <h2 id="hooks">Hooks &mdash; Automating the Lifecycle</h2>
+
+    <p>Hooks are shell commands that run at specific points in Claude Code's lifecycle. They're <strong>deterministic</strong> &mdash; they always run, unlike skills which Claude may or may not invoke.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">The Assembly Line Analogy</div>
+      <p>Hooks are like <strong>quality control stations</strong> on an assembly line. At each station, a specific check happens automatically &mdash; no one needs to remember to do it.</p>
+    </div>
+
+    <h3>Hook Events</h3>
+    <table class="ps-table">
+      <thead>
+        <tr><th>Event</th><th>When It Fires</th><th>Can Block?</th><th>Common Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>SessionStart</code></td><td>Session begins</td><td>No</td><td>Load context</td></tr>
+        <tr><td><code>PreToolUse</code></td><td>Before a tool executes</td><td>Yes</td><td>Validate, protect files</td></tr>
+        <tr><td><code>PostToolUse</code></td><td>After a tool succeeds</td><td>No</td><td>Auto-format, notify</td></tr>
+        <tr><td><code>Stop</code></td><td>Claude finishes responding</td><td>No</td><td>Verify completeness</td></tr>
+        <tr><td><code>SubagentStart</code></td><td>A subagent spawns</td><td>No</td><td>Log, audit</td></tr>
+        <tr><td><code>SessionEnd</code></td><td>Session terminates</td><td>No</td><td>Cleanup, save state</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Three Hook Types</h3>
+    <div class="card-row">
+      <div class="card">
+        <h4 style="margin-top: 0;">Command</h4>
+        <p>Run a shell command. Most common and performant.</p>
+        <pre style="margin-bottom: 0;"><code>"type": "command"
+"command": "npx prettier --write file"</code></pre>
+      </div>
+      <div class="card">
+        <h4 style="margin-top: 0;">Prompt</h4>
+        <p>Ask a fast AI model to make a yes/no decision.</p>
+        <pre style="margin-bottom: 0;"><code>"type": "prompt"
+"prompt": "Are all tasks complete?"</code></pre>
+      </div>
+      <div class="card">
+        <h4 style="margin-top: 0;">Agent</h4>
+        <p>Spawn a full subagent for complex verification.</p>
+        <pre style="margin-bottom: 0;"><code>"type": "agent"
+"prompt": "Verify tests pass"</code></pre>
+      </div>
+    </div>
+
+    <!-- ===== MCP ===== -->
+    <h2 id="mcp">MCP Servers &mdash; Extending Claude's Reach</h2>
+
+    <p>The <strong>Model Context Protocol (MCP)</strong> lets Claude connect to external services through a standardized interface.</p>
+
+    <div class="analogy">
+      <div class="analogy-label">The Plugin Analogy</div>
+      <p>MCP servers are like <strong>attachments for a power tool</strong>. Your drill (Claude) is powerful on its own, but with the right attachment, it can drive screws (query databases), bore through metal (create Jira tickets), or sand surfaces (analyze Sentry errors).</p>
+    </div>
+
+    <h3>Installation</h3>
+    <pre><code># Remote cloud service
+claude mcp add --transport http github https://api.githubcopilot.com/mcp/
+
+# Local tool
+claude mcp add --transport stdio db -- npx -y @bytebase/dbhub \
+  --dsn "postgresql://user:pass@localhost/db"
+
+# Manage
+claude mcp list       # List all
+claude mcp remove gh  # Remove one
+/mcp                  # Check status inside Claude Code</code></pre>
+
+    <!-- ===== BEST PRACTICES ===== -->
+    <h2 id="best-practices">Best Practices</h2>
+
+    <h3>Skills</h3>
+    <ul>
+      <li>Keep <code>SKILL.md</code> <strong>under 500 lines</strong> &mdash; move reference material to supporting files</li>
+      <li>Write <strong>specific descriptions</strong> with keywords users would naturally say</li>
+      <li>Use <code>disable-model-invocation: true</code> for <strong>destructive operations</strong></li>
+      <li>Include <strong>output format examples</strong> so Claude knows exactly what to produce</li>
+      <li>Test with <strong>simple inputs first</strong>, then iterate</li>
+    </ul>
+
+    <h3>Agents</h3>
+    <ul>
+      <li>Design <strong>focused agents</strong> &mdash; each should excel at one thing</li>
+      <li><strong>Limit tool access</strong> &mdash; read-only for research, full access for implementation</li>
+      <li>Use <strong>background agents</strong> for long-running tasks</li>
+      <li>Run <strong>parallel agents</strong> when exploring independent areas</li>
+    </ul>
+
+    <h3>Hooks</h3>
+    <ul>
+      <li>Use <strong>command hooks</strong> for deterministic actions (formatting, notifications)</li>
+      <li>Use <strong>prompt hooks</strong> for simple decisions</li>
+      <li>Use <strong>agent hooks</strong> for complex verification</li>
+    </ul>
+
+    <div class="highlight highlight--warning">
+      <p><strong>Start conservative:</strong> Add skills and agents as you identify repeatable patterns, not all upfront. It's better to have 3 polished skills than 15 rough ones.</p>
+    </div>
+
+    <!-- ===== PITFALLS ===== -->
+    <h2 id="pitfalls">Common Pitfalls</h2>
+
+    <table class="ps-table">
+      <thead>
+        <tr><th>Pitfall</th><th>Why It Happens</th><th>Fix</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Skill auto-invokes when it shouldn't</td><td>Description too broad</td><td>Make it more specific or add <code>disable-model-invocation: true</code></td></tr>
+        <tr><td>Inconsistent output format</td><td>No template provided</td><td>Add a template file and reference it</td></tr>
+        <tr><td>Agent output too verbose</td><td>Dumping into main context</td><td>Use subagents &mdash; results are summarized</td></tr>
+        <tr><td>New skills not detected</td><td>Created during current session</td><td>Restart Claude Code or start a new chat</td></tr>
+        <tr><td>SKILL.md and CLAUDE.md overlap</td><td>Same rules in both</td><td>CLAUDE.md = broad conventions; Skills = specific workflows</td></tr>
+        <tr><td>Too many skills loaded</td><td>Context budget exceeded</td><td>Remove low-value skills, use <code>disable-model-invocation</code></td></tr>
+      </tbody>
+    </table>
+
+    <!-- ===== GETTING STARTED ===== -->
+    <h2 id="getting-started">Getting Started &mdash; Your First 30 Minutes</h2>
+
+    <ul class="checklist">
+      <li>
+        <span class="check"></span>
+        <span><strong>Minutes 0&ndash;10:</strong> Create your first skill &mdash; pick a task you do repeatedly, write SKILL.md, test with <code>/skill-name</code></span>
+      </li>
+      <li>
+        <span class="check"></span>
+        <span><strong>Minutes 10&ndash;20:</strong> Create a custom agent &mdash; pick a role (security, performance), write the agent file, ask Claude to use it</span>
+      </li>
+      <li>
+        <span class="check"></span>
+        <span><strong>Minutes 20&ndash;30:</strong> Set up a hook &mdash; pick an automation (auto-format, notifications), add to <code>.claude/settings.json</code></span>
+      </li>
+      <li>
+        <span class="check"></span>
+        <span><strong>Beyond 30 min:</strong> Add MCP servers, create a <code>/commit</code> skill, build a <code>/review</code> agent</span>
+      </li>
+    </ul>
+
+    <!-- ===== SOURCES ===== -->
+    <h2 id="sources">Sources</h2>
+
+    <ul>
+      <li><a href="https://code.claude.com/docs/en/skills">Claude Code Skills Documentation</a></li>
+      <li><a href="https://code.claude.com/docs/en/sub-agents">Claude Code Subagents Documentation</a></li>
+      <li><a href="https://code.claude.com/docs/en/hooks-guide">Claude Code Hooks Guide</a></li>
+      <li><a href="https://code.claude.com/docs/en/mcp">Claude Code MCP Documentation</a></li>
+      <li><a href="https://code.claude.com/docs/en/agent-teams">Claude Code Agent Teams</a></li>
+      <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a></li>
+      <li><a href="https://code.claude.com/docs/en/how-claude-code-works">How Claude Code Works</a></li>
+    </ul>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="report-footer">
+    <span><span class="pure-mark">PURE</span> Internal Report &mdash; Draft</span>
+    <span>Generated 2026-02-15</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
