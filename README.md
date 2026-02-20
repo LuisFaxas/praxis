@@ -6,7 +6,7 @@
 
 From the Greek *πράσσω (prássō)* — "to do, to act, to practice."
 
-[![Version](https://img.shields.io/badge/version-1.1-7c3aed?style=for-the-badge)](https://github.com/luisfaxas/praxis)
+[![Version](https://img.shields.io/badge/version-1.2.0-7c3aed?style=for-the-badge)](https://github.com/luisfaxas/praxis)
 [![License](https://img.shields.io/badge/license-MIT-667eea?style=for-the-badge)](LICENSE)
 [![Provider](https://img.shields.io/badge/provider-agnostic-764ba2?style=for-the-badge)](#provider-integration)
 
@@ -188,36 +188,38 @@ Three specialized AI agents collaborate, each with a distinct role:
 
 ```mermaid
 graph TD
-    C["<b>Codex</b><br/>Manager<br/><i>audits, plans, reviews, creates WOs</i>"]
-    CL["<b>Claude</b><br/>Worker<br/><i>implements code, deploys, tests</i>"]
-    G["<b>Gemini</b><br/>Researcher<br/><i>deep research, SOT verification</i>"]
+    M["<b>Manager Agent</b><br/><i>audits, plans, reviews, creates WOs</i>"]
+    I["<b>Implementer Agent</b><br/><i>implements code, deploys, tests</i>"]
+    R["<b>Research Agent</b><br/><i>deep research, SOT verification</i>"]
 
-    C -->|"work orders"| CL
-    C -->|"research WOs"| G
-    CL -->|"plans & results"| C
-    G -->|"findings & reports"| C
+    M -->|"work orders"| I
+    M -->|"research WOs"| R
+    I -->|"plans & results"| M
+    R -->|"findings & reports"| M
 
-    style C fill:#667eea,stroke:#667eea,color:#fff
-    style CL fill:#764ba2,stroke:#764ba2,color:#fff
-    style G fill:#f093fb,stroke:#f093fb,color:#000
+    style M fill:#667eea,stroke:#667eea,color:#fff
+    style I fill:#764ba2,stroke:#764ba2,color:#fff
+    style R fill:#f093fb,stroke:#f093fb,color:#000
 ```
 
-| Agent | Role | Reads From | Writes To |
-|-------|------|-----------|-----------|
-| **Codex** | Manager — audits, plans, reviews, creates WOs | Full project | `work-orders/wo_claude/`, `work-orders/wo_gemini/`, `audit/` |
-| **Claude** | Worker — implements code, deploys, tests | Its assigned WOs | Source code, `commands/`, completed WOs |
-| **Gemini** | Researcher — deep research, SOT verification, codebase indexing | Its assigned WOs | `research/active/`, `audit/` (drift reports) |
+| Role | Responsibility | Reads From | Writes To |
+|------|---------------|-----------|-----------|
+| **Manager** | Audits, plans, reviews, creates WOs | Full project | `work-orders/wo_{agent}/`, `audit/` |
+| **Implementer** | Implements code, deploys, tests | Its assigned WOs | Source code, `commands/`, completed WOs |
+| **Researcher** | Deep research, SOT verification, codebase indexing | Its assigned WOs | `research/active/`, `audit/` (drift reports) |
+
+> **Example assignment:** Codex CLI as Manager, Claude Code as Implementer, Gemini CLI as Researcher. But any AI that can read and write files can fill any role.
 
 Work orders are routed to agent-specific folders:
 
 ```
 work-orders/
-├── wo_claude/
+├── wo_implementer/
 │   ├── 3_2026-02-20_AUTH_MIDDLEWARE.md
 │   └── executed/
-├── wo_codex/
+├── wo_manager/
 │   └── executed/
-└── wo_gemini/
+└── wo_researcher/
     ├── 1_2026-02-20_JWT_LIBRARY_RESEARCH.md
     └── executed/
 ```
@@ -227,11 +229,11 @@ work-orders/
 
 ```mermaid
 graph TD
-    A["Codex creates WO"] --> B["Claude writes implementation plan"]
-    B --> C["Codex reviews plan"]
-    C -->|"Approved"| D["Claude implements"]
+    A["Manager creates WO"] --> B["Implementer writes plan"]
+    B --> C["Manager reviews plan"]
+    C -->|"Approved"| D["Implementer builds"]
     C -->|"Changes requested"| B
-    D --> E["Codex audits result"]
+    D --> E["Manager audits result"]
     E -->|"Pass"| F["WO moves to executed/"]
     E -->|"Fail"| B
 
@@ -243,11 +245,11 @@ graph TD
     style F fill:#2ecc71,stroke:#2ecc71,color:#fff
 ```
 
-**Why this works:** Codex sees the full picture (discovery audit + all WOs + all plans). Claude sees only its current WO. This separation prevents scope creep and ensures every implementation aligns with the overall project plan.
+**Why this works:** The Manager sees the full picture (discovery audit + all WOs + all plans). The Implementer sees only its current WO. This separation prevents scope creep and ensures every implementation aligns with the overall project plan.
 
 </details>
 
-**Detection:** Triangle mode activates when `CODEX_INIT.md` and/or `GEMINI_INIT.md` exist in `dev/init/`. Otherwise, Solo mode is the default.
+**Detection:** Triangle mode activates when multiple provider init files exist in `dev/init/` (e.g., `CODEX_INIT.md`, `GEMINI_INIT.md` alongside `CLAUDE_INIT.md`). Otherwise, Solo mode is the default.
 
 ---
 
@@ -301,6 +303,8 @@ dev/
 │   ├── language/                   # Design tokens + methodology docs
 │   └── resources/                  # Icons, fonts, logos
 │
+├── private/                        # Sensitive docs (GITIGNORED)
+│
 └── archive/                        # Historical records
     └── {date}_{description}/       # Dated batches with manifests
 ```
@@ -329,6 +333,16 @@ During initialization, Praxis **injects** a small context handoff block into the
 ## Quick Start
 
 ### 1. Scaffold the dev/ folder
+
+**Starter** (context chain + work orders only):
+
+```bash
+mkdir -p dev/work-orders/executed
+```
+
+Then create `dev/source_of_truth.md`, `dev/context_capsule.md`, and `dev/checkpoint.md`.
+
+**Full** (complete governance layer):
 
 ```bash
 mkdir -p dev/{init,research/{active,archive},planning/master-plan/{draft,approved},work-orders/executed,commands/{active,executed},audit/{current,legacy},reports/{draft/{html,written},published/{html,written}},design/{audit/screenshots,language,resources},archive}
@@ -369,6 +383,70 @@ You're now running Praxis.
 6. **Naming convention** — `{number}_{YYYY-MM-DD}_{DESCRIPTION}.{ext}`. Number 0 = READMEs.
 7. **Commands in files, not chat** — AI never pastes multiline commands in conversation. Write to `commands/active/` and reference the path.
 8. **Context updated every session** — Source of truth (decisions), capsule (summary), checkpoint (milestones).
+9. **No secrets in dev/** — Never store API keys, passwords, tokens, or credentials in the `dev/` folder. Use `.env` files (gitignored) for secrets. Redact sensitive data in reports before promotion.
+
+---
+
+## Security & Sensitive Data
+
+Praxis is designed to live in Git repositories. These rules prevent accidental exposure:
+
+- **Never commit secrets.** API keys, passwords, tokens, and credentials belong in `.env` files, not in `dev/` documents.
+- **Redact before publishing.** Reports in `draft/` may reference internal IPs, usernames, or infrastructure details. Redact before promoting to `published/`.
+- **The `.gitignore` matters.** Praxis ships with a `.gitignore` that excludes common secret patterns. Extend it for your project.
+- **Sensitive artifacts go in `dev/private/`.** Use it for contracts, credential references, internal notes with PII, or any document that should exist in the project context but never in version control. Add `dev/private/` to your project's `.gitignore`. Reference private docs from the source of truth by path (e.g., "credentials in `dev/private/server_creds.md`").
+- **Command documents deserve extra scrutiny.** Command docs in `commands/active/` may contain connection strings, server addresses, or credentials. Review before committing to git.
+
+---
+
+## Adoption Tiers
+
+You don't have to use everything on day one. Start small and add structure as complexity grows.
+
+### Starter — Context Chain + Work Orders
+
+The minimum viable Praxis. Just 3 files and 1 folder:
+
+```
+dev/
+├── source_of_truth.md
+├── context_capsule.md
+├── checkpoint.md
+└── work-orders/
+    └── executed/
+```
+
+**Best for:** Solo developers, small projects, quick experiments. You get session continuity and task tracking with near-zero overhead.
+
+### Standard — Add Research & Planning Pipeline
+
+The full development lifecycle without the audit/report infrastructure:
+
+```
+dev/
+├── source_of_truth.md, context_capsule.md, checkpoint.md
+├── research/{active, archive}/
+├── planning/master-plan/{draft, approved}/
+├── work-orders/executed/
+└── commands/{active, executed}/
+```
+
+**Best for:** Medium projects, multi-session work, projects that need planning before building.
+
+### Full — Complete Governance Layer
+
+Everything. Audit trail, report pipeline, design assets, archive:
+
+```
+dev/
+├── (all Standard folders)
+├── audit/{current, legacy}/
+├── reports/draft/{html, written}/, published/{html, written}/
+├── design/{audit/screenshots, language, resources}/
+└── archive/
+```
+
+**Best for:** Multi-agent workflows, enterprise projects, long-running builds, projects with stakeholder reporting.
 
 ---
 
@@ -386,6 +464,58 @@ All files follow: `{number}_{YYYY-MM-DD}_{DESCRIPTION}.{ext}`
 2_2026-02-20_API_VALIDATION.md
 0_2026-02-20_README.md
 ```
+
+---
+
+## Validation (praxis-lint)
+
+Praxis includes an automated validation tool that checks whether your `dev/` folder conforms to the methodology. It transforms Praxis from convention-based (rules you follow voluntarily) to convention-enforced (rules that are verified automatically).
+
+### Quick Start
+
+```bash
+bash tools/praxis-lint.sh              # Lint current project
+bash tools/praxis-lint.sh --fix        # Auto-create missing directories
+bash tools/praxis-lint.sh --json       # JSON output for hooks/CI
+bash tools/praxis-lint.sh --strict     # Warnings become failures
+bash tools/praxis-lint.sh --help       # Full usage information
+```
+
+### What It Checks (7 Categories, 50 Checks)
+
+| Category | What | Key Checks |
+|----------|------|------------|
+| **Structure** | Required folders exist for your tier | `dev/`, core docs, work-orders/, research/, etc. |
+| **Context Freshness** | Handoff docs aren't stale | capsule < 7 days, checkpoint < 30 days |
+| **Work Orders** | Executed WOs are truly complete | No unchecked `- [ ]` boxes in executed/ |
+| **Naming** | Files follow the convention | `{number}_{YYYY-MM-DD}_{DESC}.ext` |
+| **Security** | No secrets in tracked files | Private keys, AWS keys, connection strings |
+| **SOT Consistency** | Source of Truth matches reality | Referenced folders exist, decisions logged |
+| **Orphans** | No files in wrong locations | No loose files at dev/ root |
+
+### Exit Codes
+
+| Code | Meaning | CI/CD Effect |
+|------|---------|-------------|
+| `0` | All pass (or INFO-only) | Pipeline passes |
+| `1` | Warnings found (drifting) | Pipeline passes (or fails with `--strict`) |
+| `2` | Failures found (broken) | Pipeline fails |
+
+### Integration
+
+praxis-lint integrates with both CI/CD pipelines and AI coding assistants:
+
+| Integration | How | Setup |
+|-------------|-----|-------|
+| **Claude Code** | SessionStart hook — runs automatically, feeds findings to AI | See `tools/examples/settings-hook.json` |
+| **GitHub Actions** | CI workflow — blocks PRs with failures | See `tools/examples/github-action.yml` |
+| **Pre-commit hook** | Git hook — validates before every commit | Copy hook script to `.git/hooks/pre-commit` |
+| **Any AI agent** | Init file instruction — AI runs linter as first action | Referenced in `dev/init/*_INIT.md` |
+| **Manual** | Run from terminal anytime | `bash tools/praxis-lint.sh` |
+
+**Works with gitignored dev/:** The linter reads the local filesystem, not git. If `dev/` is gitignored, local modes (manual, hooks, AI) all work. CI gracefully skips.
+
+Zero dependencies. One file. Works on any Unix system.
 
 ---
 

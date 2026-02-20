@@ -240,7 +240,15 @@ Read these files in order:
 
 ### B2. Structural Conformance Check
 
-Verify the dev/ folder matches the required structure:
+**If `tools/praxis-lint.sh` exists**, run it as the automated conformance check:
+
+```bash
+bash tools/praxis-lint.sh
+```
+
+The linter checks all 7 categories (structure, freshness, work orders, naming, security, SOT consistency, orphans) and reports findings. Use `--fix` to auto-create missing directories. Use `--json` for structured output.
+
+**If the linter is not available**, manually verify:
 
 | Check | Expected |
 |-------|----------|

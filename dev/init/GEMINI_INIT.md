@@ -194,6 +194,14 @@ For each research WO:
 
 One of Gemini's most important roles: verifying that documentation matches reality.
 
+**Automated check:** If `tools/praxis-lint.sh` exists, run it first for automated SOT consistency checks:
+
+```bash
+bash tools/praxis-lint.sh --json
+```
+
+The linter covers structural drift (missing folders, naming violations, stale context docs) and basic SOT consistency (referenced paths exist, Triangle mode config matches). Use its findings as a starting point, then perform the deeper semantic verification below that requires full-codebase awareness.
+
 **Process:**
 
 1. Read `dev/source_of_truth.md` claims about the project

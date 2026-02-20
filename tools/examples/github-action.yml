@@ -1,0 +1,35 @@
+# Praxis Lint — GitHub Actions Workflow
+# Add this to .github/workflows/praxis-lint.yml in your project
+#
+# Runs praxis-lint on every push and pull request.
+# Exit code 2 (failures) blocks the pipeline.
+# Exit code 1 (warnings) passes with a note.
+# Exit code 0 (clean) or missing dev/ passes silently.
+
+name: Praxis Lint
+
+on:
+  push:
+    branches: [main]
+    paths: ['dev/**']
+  pull_request:
+    paths: ['dev/**']
+
+jobs:
+  lint:
+    name: Validate dev/ methodology
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Praxis Lint
+        run: |
+          if [ -f "tools/praxis-lint.sh" ]; then
+            bash tools/praxis-lint.sh --no-color --skip-freshness
+          else
+            echo "praxis-lint.sh not found — skipping"
+          fi
+
+      # --skip-freshness is recommended for CI because file modification
+      # times reflect the checkout time, not the last human edit.
+      # Freshness checks are best run locally or via Claude Code hooks.

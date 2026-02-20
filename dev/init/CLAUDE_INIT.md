@@ -255,7 +255,17 @@ Use the Read tool on each file in order:
 
 ### B2. Structural Conformance Check
 
-Use Glob to verify the dev/ folder structure matches requirements:
+**If `tools/praxis-lint.sh` exists**, run it via Bash tool:
+
+```bash
+bash tools/praxis-lint.sh
+```
+
+Report findings to the user. If there are failures, offer to fix them before starting new work. Use `--fix` to auto-create missing directories.
+
+**Claude Code SessionStart hook:** If the project has `.claude/settings.json` with a SessionStart hook for praxis-lint, the linter runs automatically at session start and its output is available as context. Check for lint findings in the session context before proceeding.
+
+**If the linter is not available**, use Glob to verify the dev/ folder structure:
 
 ```
 dev/source_of_truth.md

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Add this hooks section to your .claude/settings.json to enable Praxis Lint at session start.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/tools/examples/claude-hook.sh\"",
+            "timeout": 15,
+            "statusMessage": "Running Praxis lint..."
+          }
+        ]
+      }
+    ]
+  }
+}
