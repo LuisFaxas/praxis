@@ -106,6 +106,8 @@ dev/
 │   ├── language/                   # Design language (tokens + Storybook methodology)
 │   └── resources/                  # Icons, fonts, logos
 │
+├── private/                        # Sensitive docs (GITIGNORED)
+│
 └── archive/                        # Historical records
     └── {date}_{description}/       # Dated archive batches with manifests
 ```
@@ -115,9 +117,9 @@ dev/
 | Document | Path |
 |----------|------|
 | Workspace CLAUDE.md | `<WORKSPACE_ROOT>/CLAUDE.md` |
-| Template dev/ | `<WORKSPACE_ROOT>/AI_LEARNING_CENTER/praxis_stack/dev/` |
-| HTML Report Template | `<WORKSPACE_ROOT>/AI_LEARNING_CENTER/praxis_stack/dev/reports/draft/html/0_2026-02-15_EXAMPLE_REPORT.html` |
-| Projects Root | `<WORKSPACE_ROOT>/_PROJECTS/` |
+| Template dev/ | `<WORKSPACE_ROOT>/praxis_stack/dev/` |
+| HTML Report Template | `<WORKSPACE_ROOT>/praxis_stack/dev/reports/draft/html/0_2026-02-15_EXAMPLE_REPORT.html` |
+| Projects Root | `<WORKSPACE_ROOT>/<PROJECTS_DIR>/` |
 
 > Replace `<WORKSPACE_ROOT>` with your actual workspace path.
 

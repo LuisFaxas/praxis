@@ -3,12 +3,13 @@
 - **WO#:** 0
 - **Date Created:** 2026-02-15
 - **Status:** Example (not a real work order)
-- **Assigned To:** Codex
+- **Assigned To:** (agent role or name)
 - **Priority:** Low
+- **External Reference:** (optional — Jira/Linear/GitHub Issue link)
 
 ## Description
 
-This is an example work order for Codex. Describe the task clearly — what needs to be done, which files or projects are involved, and the expected outcome.
+This is an example work order. Describe the task clearly — what needs to be done, which files or projects are involved, and the expected outcome.
 
 ## Acceptance Criteria
 
