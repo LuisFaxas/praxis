@@ -255,10 +255,10 @@ Use the Read tool on each file in order:
 
 ### B2. Structural Conformance Check
 
-**If `tools/praxis-lint.sh` exists**, run it via Bash tool:
+**If `.praxis/praxis-lint.sh` exists**, run it via Bash tool:
 
 ```bash
-bash tools/praxis-lint.sh
+bash .praxis/praxis-lint.sh
 ```
 
 Report findings to the user. If there are failures, offer to fix them before starting new work. Use `--fix` to auto-create missing directories.

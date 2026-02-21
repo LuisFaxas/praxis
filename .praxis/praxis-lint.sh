@@ -7,7 +7,7 @@
 # outputs human-readable colored text or structured JSON, and returns CI/CD-
 # compatible exit codes.
 #
-# Usage: bash tools/praxis-lint.sh [options]
+# Usage: bash .praxis/praxis-lint.sh [options]
 # Run with --help for full usage information.
 
 set -uo pipefail
@@ -56,7 +56,7 @@ print_help() {
     cat <<'HELP'
 Praxis Lint — Methodology Validation Tool
 
-Usage: bash tools/praxis-lint.sh [options]
+Usage: bash .praxis/praxis-lint.sh [options]
 
 Options:
   -h, --help              Show this help message
@@ -77,15 +77,15 @@ Exit codes:
   2  Failures found (methodology is broken)
 
 Examples:
-  bash tools/praxis-lint.sh                     # Lint current directory
-  bash tools/praxis-lint.sh --path /my/project  # Lint a specific project
-  bash tools/praxis-lint.sh --json --quiet      # JSON output for hooks
-  bash tools/praxis-lint.sh --fix               # Auto-create missing dirs
-  bash tools/praxis-lint.sh --strict            # Warnings become failures
+  bash .praxis/praxis-lint.sh                     # Lint current directory
+  bash .praxis/praxis-lint.sh --path /my/project  # Lint a specific project
+  bash .praxis/praxis-lint.sh --json --quiet      # JSON output for hooks
+  bash .praxis/praxis-lint.sh --fix               # Auto-create missing dirs
+  bash .praxis/praxis-lint.sh --strict            # Warnings become failures
 
 Integration:
-  GitHub Actions:  See tools/examples/github-action.yml
-  Claude Code:     See tools/examples/claude-hook.sh
+  GitHub Actions:  See .praxis/examples/github-action.yml
+  Claude Code:     See .praxis/examples/claude-hook.sh
   Pre-commit:      See README.md Validation section
 
 More info: https://github.com/LuisFaxas/praxis

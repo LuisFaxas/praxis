@@ -474,11 +474,11 @@ Praxis includes an automated validation tool that checks whether your `dev/` fol
 ### Quick Start
 
 ```bash
-bash tools/praxis-lint.sh              # Lint current project
-bash tools/praxis-lint.sh --fix        # Auto-create missing directories
-bash tools/praxis-lint.sh --json       # JSON output for hooks/CI
-bash tools/praxis-lint.sh --strict     # Warnings become failures
-bash tools/praxis-lint.sh --help       # Full usage information
+bash .praxis/praxis-lint.sh              # Lint current project
+bash .praxis/praxis-lint.sh --fix        # Auto-create missing directories
+bash .praxis/praxis-lint.sh --json       # JSON output for hooks/CI
+bash .praxis/praxis-lint.sh --strict     # Warnings become failures
+bash .praxis/praxis-lint.sh --help       # Full usage information
 ```
 
 ### What It Checks (7 Categories, 50 Checks)
@@ -507,11 +507,11 @@ praxis-lint integrates with both CI/CD pipelines and AI coding assistants:
 
 | Integration | How | Setup |
 |-------------|-----|-------|
-| **Claude Code** | SessionStart hook — runs automatically, feeds findings to AI | See `tools/examples/settings-hook.json` |
-| **GitHub Actions** | CI workflow — blocks PRs with failures | See `tools/examples/github-action.yml` |
+| **Claude Code** | SessionStart hook — runs automatically, feeds findings to AI | See `.praxis/examples/settings-hook.json` |
+| **GitHub Actions** | CI workflow — blocks PRs with failures | See `.praxis/examples/github-action.yml` |
 | **Pre-commit hook** | Git hook — validates before every commit | Copy hook script to `.git/hooks/pre-commit` |
 | **Any AI agent** | Init file instruction — AI runs linter as first action | Referenced in `dev/init/*_INIT.md` |
-| **Manual** | Run from terminal anytime | `bash tools/praxis-lint.sh` |
+| **Manual** | Run from terminal anytime | `bash .praxis/praxis-lint.sh` |
 
 **Works with gitignored dev/:** The linter reads the local filesystem, not git. If `dev/` is gitignored, local modes (manual, hooks, AI) all work. CI gracefully skips.
 

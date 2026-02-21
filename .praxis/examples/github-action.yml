@@ -24,8 +24,8 @@ jobs:
 
       - name: Run Praxis Lint
         run: |
-          if [ -f "tools/praxis-lint.sh" ]; then
-            bash tools/praxis-lint.sh --no-color --skip-freshness
+          if [ -f ".praxis/praxis-lint.sh" ]; then
+            bash .praxis/praxis-lint.sh --no-color --skip-freshness
           else
             echo "praxis-lint.sh not found — skipping"
           fi

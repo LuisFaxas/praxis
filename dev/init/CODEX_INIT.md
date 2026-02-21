@@ -255,10 +255,10 @@ Read these files in order:
 
 ### B2. Structural Conformance Check
 
-**If `tools/praxis-lint.sh` exists**, run it as the automated conformance check:
+**If `.praxis/praxis-lint.sh` exists**, run it as the automated conformance check:
 
 ```bash
-bash tools/praxis-lint.sh --json
+bash .praxis/praxis-lint.sh --json
 ```
 
 Parse the JSON output into an audit entry. The `--json` flag returns structured findings that Codex can analyze programmatically to decide which issues become work orders and which are informational. Report findings to the admin. Use `--fix` to auto-create missing directories.

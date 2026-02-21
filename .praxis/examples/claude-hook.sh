@@ -10,14 +10,14 @@
 #   2. Make it executable: chmod +x .claude/hooks/praxis-lint.sh
 #   3. Add the hook to .claude/settings.json (see settings-hook.json)
 #
-# Or place tools/praxis-lint.sh in your project and reference it directly.
+# Or place .praxis/praxis-lint.sh in your project and reference it directly.
 
 set -uo pipefail
 
 # Find the linter script
 LINT_SCRIPT=""
 for candidate in \
-    "$CLAUDE_PROJECT_DIR/tools/praxis-lint.sh" \
+    "$CLAUDE_PROJECT_DIR/.praxis/praxis-lint.sh" \
     "$CLAUDE_PROJECT_DIR/.claude/hooks/praxis-lint-core.sh"; do
     if [ -f "$candidate" ]; then
         LINT_SCRIPT="$candidate"
