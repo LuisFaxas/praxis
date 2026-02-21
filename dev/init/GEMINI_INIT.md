@@ -202,6 +202,8 @@ bash .praxis/praxis-lint.sh --json
 
 The linter covers structural drift (missing folders, naming violations, stale context docs) and basic SOT consistency (referenced paths exist, Triangle mode config matches). Use its findings as a starting point, then perform the deeper semantic verification below that requires full-codebase awareness.
 
+**Praxis MCP server:** If the `praxis` MCP server is registered, use `session_start` for full project state and `lint` for structured validation findings. The MCP tools provide the same data as the bash linter but in a structured format ready for programmatic analysis.
+
 **Process:**
 
 1. Read `dev/source_of_truth.md` claims about the project
@@ -284,6 +286,8 @@ Before ending any session:
 2. **Update `dev/context_capsule.md`** -- Date, research completed, findings summary, what's next
 3. **Update `dev/checkpoint.md`** -- Add milestones for completed research
 4. **Summarize for admin** -- Print what was researched, key findings, and recommendations
+
+**With MCP:** Use `update_capsule` and `update_checkpoint` tools for structured updates, then `session_end` to validate compliance.
 
 ---
 

@@ -263,6 +263,8 @@ bash .praxis/praxis-lint.sh --json
 
 Parse the JSON output into an audit entry. The `--json` flag returns structured findings that Codex can analyze programmatically to decide which issues become work orders and which are informational. Report findings to the admin. Use `--fix` to auto-create missing directories.
 
+**Praxis MCP server:** If the `praxis` MCP server is registered, use `session_start` for full project state, `lint` for validation, and `create_work_order` / `complete_work_order` for WO lifecycle management. The MCP tools enforce naming conventions and criteria completion automatically.
+
 **If the linter is not available**, manually verify the dev/ folder matches requirements (same checks as PRAXIS_INIT.md MODE B). Report missing directories or non-conforming files.
 
 ### B3. Review Pending Claude Work
@@ -363,6 +365,8 @@ Before ending any session:
 2. **Update `dev/context_capsule.md`** -- Date, what was done, WOs created/reviewed, what's next
 3. **Update `dev/checkpoint.md`** -- Add milestones for completed work
 4. **Summarize for admin** -- Print what was accomplished and what Claude/Gemini should do next
+
+**With MCP:** Use `update_capsule` and `update_checkpoint` tools for structured updates, then `session_end` to validate compliance.
 
 ---
 

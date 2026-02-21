@@ -250,6 +250,8 @@ bash .praxis/praxis-lint.sh
 
 The linter checks all 7 categories (structure, freshness, work orders, naming, security, SOT consistency, orphans) and reports findings. Use `--fix` to auto-create missing directories. Use `--json` for structured output.
 
+**If the Praxis MCP server is registered**, use `session_start` instead -- it reads the full context chain, detects tier/mode, lists pending work orders, and returns a structured project snapshot in a single tool call. See `praxis-mcp/README.md` for setup.
+
 **If the linter is not available**, manually verify:
 
 | Check | Expected |
@@ -312,6 +314,8 @@ Before ending any session, update:
 1. **source_of_truth.md** -- Add any new decisions to the Decisions Log
 2. **context_capsule.md** -- Write: date, what was done, what's next, active task status
 3. **checkpoint.md** -- Add milestones for completed work
+
+**With MCP:** Use `update_capsule` and `update_checkpoint` tools for structured updates, then `session_end` to validate compliance.
 
 ---
 

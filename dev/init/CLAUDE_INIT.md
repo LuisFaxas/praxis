@@ -265,6 +265,8 @@ Report findings to the user. If there are failures, offer to fix them before sta
 
 **Claude Code SessionStart hook:** If the project has `.claude/settings.json` with a SessionStart hook for praxis-lint, the linter runs automatically at session start and its output is available as context. Check for lint findings in the session context before proceeding.
 
+**Praxis MCP server:** If the `praxis` MCP server is registered in `.mcp.json`, use the `session_start` tool instead of manual file reads. It reads the full context chain, detects tier/mode/providers, lists pending work orders, and returns a structured project snapshot in a single call. Use `lint` for validation and `create_work_order` / `complete_work_order` for WO lifecycle management.
+
 **If the linter is not available**, use Glob to verify the dev/ folder structure:
 
 ```
@@ -351,6 +353,8 @@ Before ending any session:
 2. Update `dev/context_capsule.md` -- Date, what was done, what's next
 3. Update `dev/checkpoint.md` -- New milestones for completed work
 4. Update `CLAUDE.md` -- If new agents/skills were created or file map changed
+
+**With MCP:** Use `update_capsule` and `update_checkpoint` tools for structured updates, then `session_end` to validate compliance. The MCP tools enforce section structure and auto-number milestones.
 
 ---
 
