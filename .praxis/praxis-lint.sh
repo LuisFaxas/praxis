@@ -233,7 +233,7 @@ detect_triangle_mode() {
 
     for init_file in "$init_dir"/*_INIT.md; do
         [ -f "$init_file" ] || continue
-        [[ "$(basename "$init_file")" == "DEV_STACK_INIT.md" ]] && continue
+        [[ "$(basename "$init_file")" == "PRAXIS_INIT.md" ]] && continue
         provider_count=$((provider_count + 1))
     done
 

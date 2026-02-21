@@ -14,7 +14,7 @@ The Praxis is a filesystem-based AI development methodology. This is the Codex-s
 **How to use:** Paste this into a Codex CLI session at the start of a project. Codex will detect whether this is a new or existing project and act accordingly.
 
 **Relationship to other inits:**
-- `DEV_STACK_INIT.md` -- Provider-agnostic baseline (single-AI mode)
+- `PRAXIS_INIT.md` -- Provider-agnostic baseline (single-AI mode)
 - `CLAUDE_INIT.md` -- Claude Code worker bootstrap (implements WOs from Codex)
 - `GEMINI_INIT.md` -- Gemini librarian/researcher bootstrap (handles research WOs)
 - `CODEX_INIT.md` -- **This file.** Manager/auditor bootstrap.
@@ -263,7 +263,7 @@ bash .praxis/praxis-lint.sh --json
 
 Parse the JSON output into an audit entry. The `--json` flag returns structured findings that Codex can analyze programmatically to decide which issues become work orders and which are informational. Report findings to the admin. Use `--fix` to auto-create missing directories.
 
-**If the linter is not available**, manually verify the dev/ folder matches requirements (same checks as DEV_STACK_INIT.md MODE B). Report missing directories or non-conforming files.
+**If the linter is not available**, manually verify the dev/ folder matches requirements (same checks as PRAXIS_INIT.md MODE B). Report missing directories or non-conforming files.
 
 ### B3. Review Pending Claude Work
 

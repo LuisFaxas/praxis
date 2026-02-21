@@ -14,7 +14,7 @@ The Praxis is a filesystem-based AI development methodology. This is the Gemini-
 **How to use:** Paste this into a Gemini CLI session. Gemini will detect whether this is a new or existing project and act accordingly.
 
 **Relationship to other inits:**
-- `DEV_STACK_INIT.md` -- Provider-agnostic baseline (single-AI mode)
+- `PRAXIS_INIT.md` -- Provider-agnostic baseline (single-AI mode)
 - `CODEX_INIT.md` -- Codex manager/auditor bootstrap (creates WOs, reviews plans)
 - `CLAUDE_INIT.md` -- Claude Code worker bootstrap (implements WOs)
 - `GEMINI_INIT.md` -- **This file.** Librarian/researcher bootstrap.

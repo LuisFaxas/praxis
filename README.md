@@ -265,7 +265,7 @@ dev/
 ├── checkpoint.md                   # Progress milestones
 │
 ├── init/                           # Methodology reference docs
-│   ├── DEV_STACK_INIT.md           # Provider-agnostic init
+│   ├── PRAXIS_INIT.md           # Provider-agnostic init
 │   ├── CLAUDE_INIT.md              # Claude Code init
 │   ├── CODEX_INIT.md               # Codex manager init (Triangle)
 │   └── GEMINI_INIT.md              # Gemini researcher init (Triangle)
@@ -324,7 +324,7 @@ The methodology does NOT control how provider config files are created. Each pro
 | Claude Code | `CLAUDE.md` | `dev/init/CLAUDE_INIT.md` |
 | Codex CLI | `AGENTS.md` | `dev/init/CODEX_INIT.md` |
 | Gemini CLI | `GEMINI.md` | `dev/init/GEMINI_INIT.md` |
-| Any other | Whatever the provider uses | `dev/init/DEV_STACK_INIT.md` |
+| Any other | Whatever the provider uses | `dev/init/PRAXIS_INIT.md` |
 
 **Two-step init flow (important):**
 

@@ -32,7 +32,7 @@ Research  -->  Planning  -->  Execution  -->  Reports
 
 Praxis supports two operational modes:
 
-- **Solo mode (default):** One AI agent operates independently. Work orders live directly in `dev/work-orders/` as a flat queue. This is the default when only `DEV_STACK_INIT.md` or `CLAUDE_INIT.md` exist.
+- **Solo mode (default):** One AI agent operates independently. Work orders live directly in `dev/work-orders/` as a flat queue. This is the default when only `PRAXIS_INIT.md` or `CLAUDE_INIT.md` exist.
 - **Triangle mode (opt-in):** Multiple AI agents collaborate. Work orders are routed via agent-specific subfolders (`wo_claude/`, `wo_codex/`, `wo_gemini/`). Activated when `CODEX_INIT.md` and/or `GEMINI_INIT.md` exist alongside this file.
 
 **Detection rule:** Check `dev/init/` for which init files exist. If only generic or single-provider init files are present, use Solo mode.

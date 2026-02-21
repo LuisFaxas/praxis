@@ -64,7 +64,7 @@ dev/
 ├── checkpoint.md                   # Progress milestones
 │
 ├── init/                           # Methodology reference docs
-│   ├── DEV_STACK_INIT.md           # Provider-agnostic init spec
+│   ├── PRAXIS_INIT.md           # Provider-agnostic init spec
 │   ├── CLAUDE_INIT.md              # Claude Code-specific init
 │   ├── CODEX_INIT.md               # Codex manager init (Triangle mode)
 │   └── GEMINI_INIT.md              # Gemini researcher init (Triangle mode)

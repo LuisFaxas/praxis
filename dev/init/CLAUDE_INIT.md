@@ -9,7 +9,7 @@
 
 ## What This Is
 
-The Praxis is a filesystem-based AI development methodology. This is the Claude Code-specific initialization prompt -- it does everything the generic `DEV_STACK_INIT.md` does, plus leverages Claude Code features: CLAUDE.md project config, specialized agents (`.claude/agents/`), slash-command skills (`.claude/skills/`), and the Task tool for progress tracking.
+The Praxis is a filesystem-based AI development methodology. This is the Claude Code-specific initialization prompt -- it does everything the generic `PRAXIS_INIT.md` does, plus leverages Claude Code features: CLAUDE.md project config, specialized agents (`.claude/agents/`), slash-command skills (`.claude/skills/`), and the Task tool for progress tracking.
 
 **How to use:** Paste this into a Claude Code session, or reference it from your CLAUDE.md. Claude will detect whether this is a new or existing project and act accordingly.
 
@@ -125,7 +125,7 @@ If the project has existing code (not greenfield), perform an initial assessment
 2. Use TaskCreate to track: "Performing initial architecture audit"
 3. Use Write to save the audit report to `dev/audit/current/1_{today}_INITIAL_ARCHITECTURE_AUDIT.md`
 
-Use the format from DEV_STACK_INIT.md section A4.
+Use the format from PRAXIS_INIT.md section A4.
 
 ### A6. Create First Work Orders (Batch 0 Only)
 
