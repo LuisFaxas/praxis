@@ -1,25 +1,51 @@
 {
   "name": "praxis-mcp",
   "version": "1.0.0",
-  "description": "MCP server for the Praxis AI development methodology — structured tools for session management, work orders, context chain, and validation.",
+  "description": "MCP server for the Praxis AI development methodology — 12 structured tools for session management, work orders, context chain, validation, and scaffolding.",
   "type": "module",
   "bin": {
-    "praxis-mcp": "./build/index.js"
+    "praxis-mcp": "build/index.js"
   },
+  "files": [
+    "build/**/*.js",
+    "build/**/*.d.ts",
+    "build/**/*.js.map",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node build/index.js",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
+    "mcp-server",
     "praxis",
+    "model-context-protocol",
     "ai-development",
+    "ai-agents",
+    "agentic",
+    "ai-orchestration",
+    "multi-agent",
+    "work-orders",
     "methodology",
-    "model-context-protocol"
+    "developer-tools"
   ],
-  "author": "Luis Faxas",
+  "author": "Luis Faxas <admin@faxas.net> (https://github.com/LuisFaxas)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LuisFaxas/praxis.git",
+    "directory": "praxis-mcp"
+  },
+  "homepage": "https://github.com/LuisFaxas/praxis#mcp-server-methodology-as-a-service",
+  "bugs": {
+    "url": "https://github.com/LuisFaxas/praxis/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "zod": "^3.24.4"

@@ -7,6 +7,7 @@
 From the Greek *πράσσω (prássō)* — "to do, to act, to practice."
 
 [![Version](https://img.shields.io/badge/version-1.3.0-7c3aed?style=for-the-badge)](https://github.com/luisfaxas/praxis)
+[![npm](https://img.shields.io/npm/v/praxis-mcp?style=for-the-badge&color=fe5000&label=npm)](https://www.npmjs.com/package/praxis-mcp)
 [![License](https://img.shields.io/badge/license-MIT-667eea?style=for-the-badge)](LICENSE)
 [![Provider](https://img.shields.io/badge/provider-agnostic-764ba2?style=for-the-badge)](#provider-integration)
 
@@ -612,11 +613,13 @@ The server is **stateless** — no in-memory state between calls. Every tool rea
 
 ### Setup
 
-**Build the server:**
+**Install from npm:**
 
 ```bash
-cd praxis-mcp && npm install && npm run build
+npm install praxis-mcp
 ```
+
+That's it. The server is ready to use.
 
 **Register for Claude Code** (`.mcp.json` at your project root):
 
@@ -624,8 +627,8 @@ cd praxis-mcp && npm install && npm run build
 {
   "mcpServers": {
     "praxis": {
-      "command": "node",
-      "args": ["/path/to/praxis-mcp/build/index.js"],
+      "command": "npx",
+      "args": ["praxis-mcp"],
       "env": { "PRAXIS_PROJECT_DIR": "/path/to/your/project" }
     }
   }
@@ -636,11 +639,18 @@ cd praxis-mcp && npm install && npm run build
 
 ```toml
 [mcp_servers.praxis]
-command = "node"
-args = ["/path/to/praxis-mcp/build/index.js"]
+command = "npx"
+args = ["praxis-mcp"]
 
 [mcp_servers.praxis.env]
 PRAXIS_PROJECT_DIR = "/path/to/your/project"
+```
+
+**Build from source** (contributors only):
+
+```bash
+git clone https://github.com/LuisFaxas/praxis.git
+cd praxis/praxis-mcp && npm install && npm run build
 ```
 
 Tools appear as `mcp__praxis__session_start`, `mcp__praxis__create_work_order`, `mcp__praxis__lint`, etc. The `PRAXIS_PROJECT_DIR` environment variable tells the server which project to operate on — tools default to this path so the AI doesn't have to pass it on every call.
