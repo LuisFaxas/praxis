@@ -108,7 +108,7 @@ Save to `dev/research/active/1_{today}_LIBRARY_INDEX.md`
 
 ### A5. Integrate with GEMINI.md (Provider Config Injection)
 
-If a `GEMINI.md` already exists at the project root, READ it first and INJECT the context handoff section. If it doesn't exist, let Gemini create one per its own conventions first, then inject the following block:
+If a `GEMINI.md` already exists at the project root, READ it first and INJECT the context handoff section below. If no GEMINI.md exists, **STOP and instruct the user:** "No GEMINI.md found. Please run your native Gemini init first to create GEMINI.md, then run the Praxis init again." The native init should happen in a separate session so the AI gives the provider config its full attention.
 
 ```markdown
 ## Context Handoff (Praxis)
@@ -272,7 +272,7 @@ When the admin or Codex routes a question to Gemini, leverage the full codebase 
 
 The dev/ methodology does NOT control how provider config files are created. Providers should create their configs per their own recommendations. The dev init process then **injects** the context handoff section into the provider's existing config -- augmenting it, never replacing it.
 
-**Gemini config file:** `GEMINI.md` (at project root). Inject the Context Handoff block into the existing GEMINI.md. If it doesn't exist, let Gemini create one per its own conventions first, then inject.
+**Gemini config file:** `GEMINI.md` (at project root). Inject the Context Handoff block into the existing GEMINI.md. If it doesn't exist, stop and instruct the user to run the native Gemini init first.
 
 ---
 

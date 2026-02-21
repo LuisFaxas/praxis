@@ -84,7 +84,7 @@ Use the Write tool to create three files. Populate project-specific sections usi
 
 ### A4. Integrate with CLAUDE.md (Provider Config Injection)
 
-**CRITICAL: Do NOT replace or template the CLAUDE.md.** If a CLAUDE.md already exists at the project root, READ it first and INJECT the context handoff section. If no CLAUDE.md exists, create one following Claude Code's standard recommendations, THEN inject the handoff.
+**CRITICAL: Do NOT replace or template the CLAUDE.md.** If a CLAUDE.md already exists at the project root, READ it first and INJECT the context handoff section below. If no CLAUDE.md exists, **STOP and instruct the user:** "No CLAUDE.md found. Please run your native Claude Code init first to create CLAUDE.md, then run the Praxis init again." The native init should happen in a separate session so the AI gives the provider config its full attention without Praxis instructions competing for context.
 
 **What to inject** (append or insert into the existing CLAUDE.md):
 

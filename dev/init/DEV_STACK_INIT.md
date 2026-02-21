@@ -138,9 +138,11 @@ work-orders/
 
 ### A3. Provider Config Integration
 
-**Praxis does NOT control how provider config files are created.** Providers should create their configs per their own recommendations (e.g., CLAUDE.md for Claude Code, AGENTS.md for Codex). The init process then **injects** a context handoff section into the provider's existing config file -- augmenting it, never replacing it.
+**Praxis does NOT control how provider config files are created.** Providers should create their configs per their own recommendations (e.g., CLAUDE.md for Claude Code, AGENTS.md for Codex) in a **separate session before** running the Praxis init. The Praxis init then **injects** a context handoff section into the provider's existing config file -- augmenting it, never replacing it.
 
-Inject the following block into the provider's config file:
+**If the provider config file does not exist when the Praxis init runs, STOP.** Instruct the user to run the native provider init first, then run the Praxis init again. This two-step flow ensures the provider gets full attention for its native setup without Praxis instructions competing for context.
+
+Inject the following block into the provider's existing config file:
 
 ```markdown
 ## Context Handoff (Praxis)

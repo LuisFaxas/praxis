@@ -191,7 +191,7 @@ This master plan is the roadmap. WOs are decomposed from it incrementally as wor
 
 #### A9. Integrate with AGENTS.md (Provider Config Injection)
 
-If an `AGENTS.md` already exists at the project root, READ it first and INJECT the context handoff section. If it doesn't exist, let Codex create one per its own conventions first, then inject the following block:
+If an `AGENTS.md` already exists at the project root, READ it first and INJECT the context handoff section below. If no AGENTS.md exists, **STOP and instruct the user:** "No AGENTS.md found. Please run your native Codex init first to create AGENTS.md, then run the Praxis init again." The native init should happen in a separate session so the AI gives the provider config its full attention.
 
 ```markdown
 ## Context Handoff (Praxis)
@@ -351,7 +351,7 @@ This is the core loop of the Triangle Pattern. It runs for every non-trivial wor
 
 The dev/ methodology does NOT control how provider config files are created. Providers should create their configs per their own recommendations. The dev init process then **injects** the context handoff section into the provider's existing config -- augmenting it, never replacing it.
 
-**Codex config file:** `AGENTS.md` (at project root). Inject the Context Handoff block into the existing AGENTS.md. If it doesn't exist, let Codex create one per its own conventions first, then inject.
+**Codex config file:** `AGENTS.md` (at project root). Inject the Context Handoff block into the existing AGENTS.md. If it doesn't exist, stop and instruct the user to run the native Codex init first.
 
 ---
 

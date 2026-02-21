@@ -326,7 +326,12 @@ The methodology does NOT control how provider config files are created. Each pro
 | Gemini CLI | `GEMINI.md` | `dev/init/GEMINI_INIT.md` |
 | Any other | Whatever the provider uses | `dev/init/DEV_STACK_INIT.md` |
 
-During initialization, Praxis **injects** a small context handoff block into the provider's existing config — augmenting it, never replacing it. This ensures the AI knows where to find the context chain on every new session.
+**Two-step init flow (important):**
+
+1. **Native init first** — Let the AI create its own config file in a dedicated session (e.g., Claude creates `CLAUDE.md`, Codex creates `AGENTS.md`). The AI gives its native setup full attention.
+2. **Praxis init second** — Run the Praxis init (paste or reference `dev/init/*_INIT.md`). Praxis **injects** a small context handoff block into the provider's existing config — augmenting it, never replacing it. If the provider config doesn't exist, Praxis will stop and ask you to run step 1 first.
+
+This ensures the AI knows where to find the context chain on every new session, without Praxis overriding the provider's native conventions.
 
 ---
 
