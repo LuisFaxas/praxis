@@ -211,6 +211,12 @@ graph TD
 
 > **Example assignment:** Codex CLI as Manager, Claude Code as Implementer, Gemini CLI as Researcher. But any AI that can read and write files can fill any role.
 
+**Important:** Triangle is a role topology, not a provider lock-in.
+
+- You can run Triangle with **three different providers** (for example Codex + Claude + Gemini).
+- You can run Triangle with the **same provider in three parallel sessions** (for example Claude session A/B/C, each with a different role).
+- You can run Triangle with **hybrid private/local nodes** (for example OpenCode or other self-hosted agents) as long as each agent follows the same filesystem contract.
+
 Work orders are routed to agent-specific folders:
 
 ```
@@ -251,6 +257,18 @@ graph TD
 </details>
 
 **Detection:** Triangle mode activates when multiple provider init files exist in `dev/init/` (e.g., `CODEX_INIT.md`, `GEMINI_INIT.md` alongside `CLAUDE_INIT.md`). Otherwise, Solo mode is the default.
+
+### Beyond Triangle: Extensible Topologies
+
+Triangle is the recommended starting pattern because it is simple and predictable. Praxis itself is not limited to three agents.
+
+If your project needs more parallelism, you can scale to N-agent graphs (mixed providers, same-provider parallel sessions, and private/self-hosted nodes), while keeping the same core contract:
+
+1. Role ownership stays explicit.
+2. Work order routing stays deterministic.
+3. Validation and phase gates stay enforced.
+
+Praxis governs **coordination and context continuity** across agents. It does not constrain which provider or model you use.
 
 ---
 
@@ -317,6 +335,12 @@ dev/
 ## Provider Integration
 
 Praxis is **provider-agnostic**. It works with any AI assistant that can read and write files.
+
+Providers and roles are decoupled:
+
+- Roles are operational (`manager`, `implementer`, `researcher`, or custom role sets).
+- Providers are implementation choices (Claude, Codex, Gemini, OpenCode, private/local LLMs, etc.).
+- The same provider can fill multiple roles via separate sessions if role boundaries are preserved.
 
 The methodology does NOT control how provider config files are created. Each provider creates their config per their own conventions:
 
@@ -711,7 +735,7 @@ Each layer adds automation. None of them add lock-in.
 
 ## Origin Story
 
-Praxis is the culmination of thousands of hours working alongside the most capable agentic LLMs available — Claude Opus 4.6, GPT-5.2, Gemini with its 2M-token context window — pushing them to their limits on real projects. Not toy demos. Not tutorial apps. Real infrastructure builds, real web applications, real multi-agent workflows where mistakes cost hours and context loss costs days.
+Praxis is the culmination of thousands of hours pushing the most capable agentic LLMs to their limits on real projects. Not toy demos. Not tutorial apps. Real infrastructure builds, real web applications, real multi-agent workflows where mistakes cost hours and context loss costs days.
 
 But the methodology didn't come from AI alone. It came from an unexpected place: **property management.**
 
