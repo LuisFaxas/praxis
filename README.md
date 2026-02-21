@@ -672,9 +672,11 @@ See [`praxis-mcp/README.md`](praxis-mcp/README.md) for the complete tool referen
 
 ---
 
-## Why Filesystem?
+## The Foundation: Why Filesystem?
 
-Praxis deliberately uses the filesystem instead of a database, API, or SaaS platform:
+The MCP server is how Praxis scales. But the filesystem is how it *survives.*
+
+Every methodology choice above — the context chain, the work orders, the four-stage lifecycle — is built on a deliberate foundation: the file system. Not a database. Not an API. Not a SaaS platform. Files and folders.
 
 - **Zero dependencies** — Works anywhere there's a file system. No installs, no accounts, no subscriptions.
 - **Git-friendly** — The `dev/` folder can be tracked (or gitignored for private projects). Full version history for free.
@@ -682,6 +684,18 @@ Praxis deliberately uses the filesystem instead of a database, API, or SaaS plat
 - **Human-readable** — Open any file in any text editor. No special tools needed to understand the project state.
 - **Portable** — Copy the `dev/` folder to a new machine, a new project, a new team. It just works.
 - **Transparent** — No hidden state. Everything is visible, auditable, and diffable.
+
+This matters because it means **Praxis works without the MCP server.** Any AI that can read a file can follow the methodology. The init docs contain everything — the rules, the folder structure, the session protocol. An AI with no MCP support can still read `CLAUDE_INIT.md`, follow the instructions, and operate a fully governed Praxis workflow.
+
+The MCP server doesn't replace this foundation. It **accelerates** it. Files are the state. Tools are the interface. You can run Praxis at any level:
+
+| Level | What You Need | What You Get |
+|-------|--------------|--------------|
+| **Files only** | Any AI + init docs | Full methodology — context chain, work orders, audit trail |
+| **Files + Lint** | Any Unix system | Automated validation — 50 checks, CI/CD integration |
+| **Files + MCP** | MCP-compatible AI | Native tools — one-call session start, auto-numbered WOs, enforced quality gates |
+
+Each layer adds automation. None of them add lock-in.
 
 ---
 
@@ -699,7 +713,11 @@ Praxis bridges two worlds:
 - **The organizational discipline** of real-world project management — work orders, audit trails, handoff protocols, quality gates
 - **The technical capabilities** of modern AI agents — code generation, research, architecture analysis, multi-agent orchestration
 
-The result is a methodology where humans and AI agents collaborate as equals, each compensating for the other's limitations. AI has unlimited patience and processing power but no persistent memory. Humans have institutional knowledge and decision authority but limited bandwidth. Praxis gives both sides a shared filesystem-based workspace where context persists, work is tracked, and nothing gets lost.
+The result is a methodology where humans and AI agents collaborate as equals, each compensating for the other's limitations. AI has unlimited patience and processing power but no persistent memory. Humans have institutional knowledge and decision authority but limited bandwidth. Praxis gives both sides a shared workspace where context persists, work is tracked, and nothing gets lost.
+
+The evolution tells the story: **v1.1** gave AI agents structured folders and markdown documents to follow. **v1.2** added `praxis-lint` — 50 automated checks that enforce the rules. **v1.3** added the MCP server — 12 native tools that turn the methodology into something the AI doesn't just follow, but *calls.* Session start, work order creation, context updates, quality gates — all as native tool calls that any MCP-compatible AI invokes automatically.
+
+The filesystem is the foundation. The linter is the guardrails. **The MCP server is the interface.** Together, they make Praxis the first AI development methodology that governs itself.
 
 Every rule in this methodology exists because its absence caused a real problem on a real project. Nothing is theoretical. Everything is *praxis*.
 
