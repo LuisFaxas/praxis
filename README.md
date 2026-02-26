@@ -10,6 +10,7 @@ From the Greek *πράσσω (prássō)* — "to do, to act, to practice."
 [![npm](https://img.shields.io/npm/v/praxis-mcp?style=for-the-badge&color=fe5000&label=npm)](https://www.npmjs.com/package/praxis-mcp)
 [![License](https://img.shields.io/badge/license-MIT-667eea?style=for-the-badge)](LICENSE)
 [![Provider](https://img.shields.io/badge/provider-agnostic-764ba2?style=for-the-badge)](#provider-integration)
+[![Website](https://img.shields.io/badge/website-faxas.net-667eea?style=for-the-badge)](https://faxas.net/methodology)
 
 *Zero dependencies. Just folders, markdown, and native AI tools.*
 
@@ -126,6 +127,106 @@ Every folder in `dev/` maps to one of these stages. When you open a Praxis proje
 | `dev/design/` | Design assets — tokens, brand guidelines, visual audit captures |
 | `dev/archive/` | Historical records — retired documents with manifests |
 
+### Research: Gather Before Deciding
+
+Research is **Stage 1** — it flows upstream into planning. Everything in `dev/research/` exists to inform a decision that hasn't been made yet.
+
+```
+dev/research/
+├── active/       # Research for current, open decisions
+└── archive/      # Decision made — kept for reference
+```
+
+**The flow:** When you need to choose between PostgreSQL and MySQL, or evaluate three hosting providers, or compare authentication libraries — that investigation lives in `active/`. Once the decision is made and recorded in `source_of_truth.md`, the research moves to `archive/`. It's never deleted — it's the receipts for why you chose what you chose.
+
+**Common research types:** pricing comparisons, dependency audits, technology evaluations, architecture analysis, security advisory reviews, competitive benchmarks.
+
+**Research is not reporting.** This distinction matters. Research gathers information *before* a decision (upstream). Reports communicate results *after* work is done (downstream). A technology comparison that helps you pick a database? Research. A progress update for a stakeholder? Report. They live in different folders because they serve different stages of the pipeline.
+
+### Planning: Decide Before Building
+
+Planning is **Stage 2** — where research findings become decisions and decisions become actionable plans.
+
+```
+dev/planning/
+└── master-plan/
+    ├── draft/      # Working plans (AI writes here)
+    └── approved/   # Finalized plans (admin promotes)
+```
+
+**The flow:** The AI writes master plans to `draft/`. The admin reviews and promotes to `approved/`. The AI never writes directly to `approved/` — this gate ensures a human reviews every strategic decision before work begins.
+
+**Master plan → Work order decomposition:** The master plan captures the full project roadmap, organized into batches:
+
+| Batch | Scope | When to Create WOs |
+|-------|-------|-------------------|
+| **0: Critical** | Security vulnerabilities, broken builds, data loss risks | Immediately during init |
+| **1: Foundation** | Scaffolding, structural improvements, tooling setup | After Batch 0 is complete |
+| **2: Core** | Feature work, architecture implementation | After Batch 1 is complete |
+| **3: Quality** | Testing, documentation, polish | After Batch 2 is complete |
+
+Work orders are decomposed from the master plan incrementally — not all at once. This prevents scope overload and keeps the active queue focused.
+
+### Execution: Build with Traceability
+
+Execution is **Stage 3** — where plans become reality. This stage has two artifact types:
+
+**Work orders** are the primary execution unit. They're covered in detail in the [Work Orders section](#work-orders-the-core-innovation) above — scoped tasks with acceptance criteria, assigned agents, and a pending → executed lifecycle.
+
+**Commands** handle a specific execution problem: when the AI needs multi-step shell commands run on a server or workstation, it can't just paste them in chat. Instead:
+
+```
+dev/commands/
+├── active/
+│   └── 3_2026-02-20_SSL_SETUP/    # Topic subfolder with step-by-step commands
+│       ├── 01_GENERATE_CERTS.md
+│       └── 02_CONFIGURE_NGINX.md
+└── executed/                        # Completed command sets
+```
+
+The AI writes commands to `active/{topic}/` and references the doc path and step number: *"Run Step 1 in `dev/commands/active/3_2026-02-20_SSL_SETUP/01_GENERATE_CERTS.md`."* The admin reviews and executes. Completed sets move to `executed/`.
+
+**Why files instead of chat?** Three reasons: (1) prevents copy-paste errors on complex multi-line commands, (2) creates an audit trail of every command run on the system, (3) allows the admin to review commands before execution — especially important for destructive operations.
+
+### Reports: Communicate Results
+
+Reports are **Stage 4** — the final stage of the pipeline. Everything upstream (research, planning, execution) has produced results. Reports communicate those results to stakeholders.
+
+```
+dev/reports/
+├── draft/
+│   ├── html/       # Visual reports (interactive, styled)
+│   └── written/    # Written analysis (markdown)
+└── published/
+    ├── html/       # Final HTML (admin promotes here)
+    └── written/    # Final written (admin promotes here)
+```
+
+**The draft/published wall:** AI writes to `draft/` only. The admin reviews, redacts any sensitive information (internal IPs, credentials, PII), and promotes to `published/`. The AI never reads from or writes to `published/`. This wall exists because published reports go to external stakeholders — they must be reviewed by a human before leaving the project.
+
+**Two formats:** HTML reports are visual and interactive — benchmark dashboards, progress emails, styled presentations. Written reports are markdown — technical analysis, architecture reviews, decision documents. Both follow the same draft → published flow.
+
+### Audit: Track Quality
+
+Audit is a **cross-cutting concern** — it doesn't belong to a single pipeline stage. Audits can happen during planning (discovery), execution (completion), or maintenance (drift detection).
+
+```
+dev/audit/
+├── current/    # Active audit entries
+└── legacy/     # Archived by admin
+```
+
+**Audit types:**
+
+| Type | When | What It Checks |
+|------|------|----------------|
+| **Discovery audit** | First encounter with a codebase | Tech stack, architecture, risks, dependencies, test coverage |
+| **Completion audit** | After a WO is marked done | Acceptance criteria met, code quality, no regressions |
+| **Drift report** | Periodic or on-demand | Source of truth claims vs. actual codebase state |
+| **Conformance check** | Session start or CI | Folder structure, naming conventions, file freshness |
+
+The linter (`praxis-lint.sh`) automates conformance checks. Discovery and completion audits are performed by the Manager agent in Triangle mode, or by any agent in Solo mode. Drift reports are typically the Researcher's responsibility — comparing what the documentation claims against what the code actually does.
+
 ---
 
 ## The Context Chain
@@ -179,7 +280,7 @@ One AI agent operates independently. Work orders are a flat queue:
 work-orders/
 ├── 1_2026-02-20_AUTH_MIDDLEWARE.md     (pending)
 ├── 2_2026-02-20_API_VALIDATION.md     (pending)
-└── executed/
+└── _executed/
     └── 0_2026-02-19_PROJECT_SETUP.md  (done)
 ```
 
@@ -365,9 +466,9 @@ This ensures the AI knows where to find the context chain on every new session, 
 ### Option A: CLI Init (Recommended)
 
 ```bash
-npx praxis-mcp@1.1.0 init                                     # starter tier, solo mode
-npx praxis-mcp@1.1.0 init --tier full --mode triangle          # full tier, multi-agent
-npx praxis-mcp@1.1.0 init --tier standard --path ./my-project  # custom path
+npx praxis-mcp init                                     # starter tier, solo mode
+npx praxis-mcp init --tier full --mode triangle          # full tier, multi-agent
+npx praxis-mcp init --tier standard --path ./my-project  # custom path
 ```
 
 This creates the `dev/` folder structure, context documents, `.praxis/praxis-lint.sh`, and (in triangle mode) agent folders with `_executed/` directories. One command, fully scaffolded.
@@ -863,7 +964,9 @@ The MIT License means you can freely use, modify, and distribute Praxis — incl
 
 <div align="center">
 
-**Created by Luis Faxas, 2026.**
+**Created by [Luis Faxas](https://faxas.net/methodology), 2026.**
+
+[faxas.net/methodology](https://faxas.net/methodology) — full methodology explanation, examples, and resources.
 
 > *"The process by which theory becomes practice."*
 > *— Aristotle, on πρᾶξις*
