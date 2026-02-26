@@ -8,7 +8,7 @@ if (subcommand === "init") {
   const { runInit } = await import("./cli-init.js");
   await runInit(process.argv.slice(3));
 } else if (subcommand === "--version" || subcommand === "-v") {
-  console.log("praxis-mcp v1.1.0");
+  console.log("praxis-mcp v1.1.1");
 } else {
   // Default: start MCP server
   const { McpServer } = await import("@modelcontextprotocol/sdk/server/mcp.js");
@@ -22,7 +22,7 @@ if (subcommand === "init") {
 
   const server = new McpServer({
     name: "praxis",
-    version: "1.1.0",
+    version: "1.1.1",
   });
 
   // Register all tool categories
