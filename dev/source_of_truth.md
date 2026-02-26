@@ -26,7 +26,7 @@ These rules apply to ALL projects across the workspace.
 1. This workspace is **non-destructive** -- no SSH to company servers from here.
 2. Project repos in `_PROJECTS/` are local copies only.
 3. Only the admin (user) moves reports from `draft/` to `published/`.
-4. Work orders live in `dev/work-orders/`; completed ones move to `executed/`.
+4. Work orders live in `dev/work-orders/`; completed ones move to `_executed/` (or `executed/` in legacy projects).
 5. **Every new project gets a fresh `dev/` folder** -- self-contained and deployable as-is.
 6. **Never create files at the workspace root** -- all output goes into project folders or the dev structure.
 7. **Items only move to `executed/` when complete** -- work orders, commands, and other trackable items stay in their parent folder while pending and only move to `executed/` once finished.
@@ -44,6 +44,15 @@ All files use the format: `{number}_{YYYY-MM-DD}_{DESCRIPTION}.{ext}`
 - **Date** -- Creation date in ISO format (YYYY-MM-DD)
 - **Description** -- UPPERCASE, underscore-separated
 - Number 0 is reserved for READMEs and examples in each folder
+- Patch WOs use `_P{NN}` suffix: `{number}_{YYYY-MM-DD}_{DESCRIPTION}_P{NN}.md`
+
+## Lane Naming Convention
+
+WO lanes use: `{nn}_{type}_{scope}`
+
+- **nn** -- Two-digit prefix for ordering (10, 20, 30...)
+- **type** -- One of: `delivery`, `program`, `lab`, `ops`
+- **scope** -- snake_case description (e.g., `academy`, `site_core`)
 
 ## Workflow
 

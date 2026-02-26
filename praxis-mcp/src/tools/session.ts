@@ -10,7 +10,7 @@ import { z } from "zod";
 import { join } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { detectProject, detectTier, detectMode, detectProviders } from "../lib/detection.js";
-import { readFileSafe, getFileAgeDays, getFileSize, wasModifiedToday, resolveDevPath, listMarkdownFiles, listSubdirectories } from "../lib/fs-helpers.js";
+import { readFileSafe, getFileAgeDays, getFileSize, wasModifiedToday, resolveDevPath, listMarkdownFiles, listSubdirectories, discoverLanes } from "../lib/fs-helpers.js";
 import { parseCapsule, parseCheckpoint, parseSOT, parseWorkOrder } from "../lib/parsers.js";
 
 function getProjectPath(override?: string): string {
@@ -194,6 +194,7 @@ export function registerSessionTools(server: McpServer): void {
 interface PendingWO {
   filename: string;
   agent: string | null;
+  lane: string | null;
   title: string | null;
   status: string | null;
   priority: string | null;
@@ -205,40 +206,17 @@ async function listPendingWorkOrders(devPath: string, mode: string): Promise<Pen
   const results: PendingWO[] = [];
   const woRoot = join(devPath, "work-orders");
 
-  if (mode === "triangle") {
-    // Scan wo_*/ subfolders
-    const agentDirs = await listSubdirectories(woRoot, "wo_");
-    for (const dir of agentDirs) {
-      const agent = dir.replace("wo_", "");
-      const files = await listMarkdownFiles(join(woRoot, dir));
-      for (const file of files) {
-        const content = await readFileSafe(join(woRoot, dir, file));
-        if (!content) continue;
-        const parsed = parseWorkOrder(content);
-        if (parsed.status?.toLowerCase() !== "complete" && parsed.status?.toLowerCase() !== "completed") {
-          results.push({
-            filename: file,
-            agent,
-            title: parsed.title,
-            status: parsed.status,
-            priority: parsed.priority,
-            criteriaTotal: parsed.criteriaTotal,
-            criteriaChecked: parsed.criteriaChecked,
-          });
-        }
-      }
-    }
-  } else {
-    // Solo mode: scan wo root directly
-    const files = await listMarkdownFiles(woRoot);
+  async function scanPending(dirPath: string, agentName: string | null, laneName: string | null) {
+    const files = await listMarkdownFiles(dirPath);
     for (const file of files) {
-      const content = await readFileSafe(join(woRoot, file));
+      const content = await readFileSafe(join(dirPath, file));
       if (!content) continue;
       const parsed = parseWorkOrder(content);
       if (parsed.status?.toLowerCase() !== "complete" && parsed.status?.toLowerCase() !== "completed") {
         results.push({
           filename: file,
-          agent: null,
+          agent: agentName,
+          lane: laneName,
           title: parsed.title,
           status: parsed.status,
           priority: parsed.priority,
@@ -247,6 +225,25 @@ async function listPendingWorkOrders(devPath: string, mode: string): Promise<Pen
         });
       }
     }
+  }
+
+  if (mode === "triangle") {
+    const agentDirs = await listSubdirectories(woRoot, "wo_");
+    for (const dir of agentDirs) {
+      const agent = dir.replace("wo_", "");
+      const agentPath = join(woRoot, dir);
+
+      // Scan top-level agent WOs
+      await scanPending(agentPath, agent, null);
+
+      // Scan lane subfolders
+      const lanes = await discoverLanes(agentPath);
+      for (const laneName of lanes) {
+        await scanPending(join(agentPath, laneName), agent, laneName);
+      }
+    }
+  } else {
+    await scanPending(woRoot, null, null);
   }
 
   return results;

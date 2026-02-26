@@ -156,3 +156,37 @@ export async function wasModifiedToday(filePath: string): Promise<boolean> {
 export function resolveDevPath(projectPath: string): string {
   return join(projectPath, "dev");
 }
+
+/**
+ * Discover lane subfolders inside an agent directory.
+ * Lanes match the pattern: {nn}_{type}_{scope} (e.g., 10_delivery_academy).
+ * Returns sorted lane folder names. Returns [] if no lanes exist.
+ */
+export async function discoverLanes(agentDir: string): Promise<string[]> {
+  const LANE_PATTERN = /^\d{2}_(delivery|program|lab|ops)_[a-z0-9_]+$/;
+  try {
+    const entries = await readdir(agentDir, { withFileTypes: true });
+    return entries
+      .filter((e) => e.isDirectory() && LANE_PATTERN.test(e.name))
+      .map((e) => e.name)
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Resolve the executed directory for a given base path.
+ * Prefers `_executed/` (new convention) over `executed/` (legacy).
+ * Returns the preferred path even if neither exists (caller should ensure creation).
+ */
+export async function resolveExecutedDir(baseDir: string): Promise<string> {
+  const preferred = join(baseDir, "_executed");
+  const legacy = join(baseDir, "executed");
+
+  if (await isDirectory(preferred)) return preferred;
+  if (await isDirectory(legacy)) return legacy;
+
+  // Default to new convention
+  return preferred;
+}

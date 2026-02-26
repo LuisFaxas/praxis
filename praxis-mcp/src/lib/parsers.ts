@@ -10,6 +10,7 @@
 export interface WOCriterion {
   text: string;
   checked: boolean;
+  na: boolean;
 }
 
 export interface ParsedWorkOrder {
@@ -23,6 +24,10 @@ export interface ParsedWorkOrder {
   criteria: WOCriterion[];
   criteriaTotal: number;
   criteriaChecked: number;
+  criteriaNa: number;
+  parentWo: number | null;
+  patchNumber: string | null;
+  sequenceKey: string | null;
   raw: string;
 }
 
@@ -58,13 +63,22 @@ export function parseWorkOrder(content: string): ParsedWorkOrder {
   // Extract acceptance criteria checkboxes
   const criteria: WOCriterion[] = [];
   const criteriaRegex = /- \[([ x])\]\s+(.+)/g;
+  const naPattern = /^~~.+~~\s*N\/A\s*[—–-]/;
   let match: RegExpExecArray | null;
   while ((match = criteriaRegex.exec(content)) !== null) {
+    const text = match[2].trim();
+    const isNa = naPattern.test(text);
     criteria.push({
-      checked: match[1] === "x",
-      text: match[2].trim(),
+      checked: match[1] === "x" || isNa,
+      na: isNa,
+      text,
     });
   }
+
+  // Parse patch metadata
+  const parentWoMatch = content.match(/\*\*Parent WO:\*\*\s*(\d+)/);
+  const patchMatch = content.match(/\*\*Patch:\*\*\s*P?(\d+)/);
+  const seqKeyMatch = content.match(/\*\*Sequence Key:\*\*\s*(.+)/);
 
   return {
     number: numberMatch ? parseInt(numberMatch[1], 10) : null,
@@ -77,6 +91,10 @@ export function parseWorkOrder(content: string): ParsedWorkOrder {
     criteria,
     criteriaTotal: criteria.length,
     criteriaChecked: criteria.filter((c) => c.checked).length,
+    criteriaNa: criteria.filter((c) => c.na).length,
+    parentWo: parentWoMatch ? parseInt(parentWoMatch[1], 10) : null,
+    patchNumber: patchMatch ? patchMatch[1].padStart(2, "0") : null,
+    sequenceKey: seqKeyMatch ? seqKeyMatch[1].trim() : null,
     raw: content,
   };
 }

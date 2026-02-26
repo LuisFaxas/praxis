@@ -5,7 +5,7 @@
  * Convention: {number}_{YYYY-MM-DD}_{DESCRIPTION}.{ext}
  */
 
-import { NAMING_REGEX } from "./constants.js";
+import { NAMING_REGEX, PATCH_SUFFIX_REGEX } from "./constants.js";
 
 /**
  * Get today's date in ISO format (YYYY-MM-DD).
@@ -76,4 +76,48 @@ export function isValidPraxisFilename(filename: string): boolean {
 export function extractNumber(filename: string): number | null {
   const match = filename.match(NAMING_REGEX);
   return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * Extract the patch number from a filename with _P{NN} suffix.
+ * "5_2026-02-20_TASK_P01.md" → "01", "5_2026-02-20_TASK.md" → null
+ */
+export function extractPatchNumber(filename: string): string | null {
+  const match = filename.match(PATCH_SUFFIX_REGEX);
+  return match ? match[1] : null;
+}
+
+/**
+ * Format a patch work order filename.
+ * Returns: "{parentNumber}_{YYYY-MM-DD}_{DESCRIPTION}_P{NN}.md"
+ */
+export function formatPatchFilename(
+  parentNumber: number,
+  date: string,
+  description: string,
+  patchNumber: string
+): string {
+  const desc = toUpperSnakeCase(description);
+  return `${parentNumber}_${date}_${desc}_P${patchNumber}.md`;
+}
+
+/**
+ * Determine the next patch number for a given parent WO.
+ * Scans existing files for the highest _P{NN} suffix matching the parent number.
+ * Returns the next patch as zero-padded string (e.g., "01", "02").
+ */
+export function nextPatchNumber(existingFiles: string[], parentNumber: number): string {
+  let highest = 0;
+  const parentPrefix = `${parentNumber}_`;
+
+  for (const file of existingFiles) {
+    if (!file.startsWith(parentPrefix)) continue;
+    const patchNum = extractPatchNumber(file);
+    if (patchNum) {
+      const num = parseInt(patchNum, 10);
+      if (num > highest) highest = num;
+    }
+  }
+
+  return String(highest + 1).padStart(2, "0");
 }

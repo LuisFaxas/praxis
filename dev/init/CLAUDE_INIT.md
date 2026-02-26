@@ -336,6 +336,14 @@ Create conformance WOs for agents that need updating.
 12. **Never paste multiline commands in chat** -- Write to `dev/commands/active/` instead.
 13. **Use TaskCreate/TaskUpdate** for multi-step operations to track progress.
 
+## Lane & Patch Conventions (v1.3.1)
+
+- **WO Lanes:** In projects with lanes (e.g., `10_delivery_academy/`), create WOs inside the appropriate lane folder. Use the `lane` parameter with `create_work_order` if using MCP.
+- **Centralized completion:** Completed lane WOs go to `_executed/{lane}/`, not inside the lane folder.
+- **Patch WOs:** Use `create_patch_work_order` (MCP) or the `_P{NN}` suffix to extend completed parent WOs.
+- **N/A criteria:** Mark inapplicable criteria as `- [ ] ~~text~~ N/A — reason`. Max 3 per WO. Prefer rewriting criteria in active WOs over marking N/A.
+- **`_executed/` preference:** New projects use `_executed/` instead of `executed/`. Legacy `executed/` is still supported.
+
 ## Triangle Pattern Rules (active only when CODEX_INIT.md is present)
 
 14. **Plan mode for every WO** -- In Triangle mode, enter plan mode for every work order received from Codex. Write the implementation plan, then wait for Codex review before implementing. Do not implement without approval.

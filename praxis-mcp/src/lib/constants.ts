@@ -60,6 +60,18 @@ export const INIT_FILE_SUFFIX = "_INIT.md";
 // Work order file naming pattern: {number}_{YYYY-MM-DD}_{DESCRIPTION}.md
 export const NAMING_REGEX = /^(\d+)_(\d{4}-\d{2}-\d{2})_(.+)\.md$/;
 
+// Lane folder naming pattern: {nn}_{type}_{scope}
+export const LANE_REGEX = /^(\d{2})_(delivery|program|lab|ops)_([a-z0-9_]+)$/;
+
+// Patch WO suffix pattern: _P{NN}.md
+export const PATCH_SUFFIX_REGEX = /_P(\d{2})\.md$/;
+
+// N/A criteria pattern: - [ ] ~~text~~ N/A — reason
+export const NA_CRITERIA_REGEX = /^- \[ \] ~~.+~~\s*N\/A\s*[—–-]\s*.+$/;
+
+// Lane types with relaxed validation (no Acceptance Criteria / Status required)
+export const RELAXED_LANE_TYPES = ["program", "lab"];
+
 // Work order template used by create_work_order
 export const WO_TEMPLATE = `# Work Order: {TITLE}
 
@@ -68,6 +80,30 @@ export const WO_TEMPLATE = `# Work Order: {TITLE}
 - **Status:** Pending
 - **Assigned To:** {ASSIGNED_TO}
 - **Priority:** {PRIORITY}
+
+## Description
+
+{DESCRIPTION}
+
+## Acceptance Criteria
+
+{CRITERIA}
+
+## Notes
+
+`;
+
+// Patch work order template (extends WO_TEMPLATE with parent metadata)
+export const PATCH_WO_TEMPLATE = `# Work Order: {TITLE}
+
+- **WO#:** {NUMBER}
+- **Date Created:** {DATE}
+- **Status:** Pending
+- **Assigned To:** {ASSIGNED_TO}
+- **Priority:** {PRIORITY}
+- **Parent WO:** {PARENT_WO}
+- **Patch:** {PATCH_NUMBER}
+- **Sequence Key:** {SEQUENCE_KEY}
 
 ## Description
 

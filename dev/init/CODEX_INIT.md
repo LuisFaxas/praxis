@@ -349,6 +349,13 @@ This is the core loop of the Triangle Pattern. It runs for every non-trivial wor
 12. **Plan reviews are BLOCKING** -- Claude does not implement until Codex approves the plan. The admin facilitates this by showing Claude's plan to Codex.
 13. **Discovery audit is MANDATORY** -- On the first session with a new project, Codex always performs a full discovery audit before creating any WOs.
 
+### Lane & Patch Conventions (v1.3.1)
+
+- **WO Lanes:** When creating WOs for large projects, organize them into typed lanes (e.g., `10_delivery_academy/`, `70_program_methodology_rewrite/`). Use `create_work_order` with the `lane` parameter.
+- **Centralized completion:** Lane WOs complete to `_executed/{lane}/`, not inside the lane.
+- **Patch WOs:** Use `create_patch_work_order` to extend completed parent WOs with the `_P{NN}` suffix.
+- **N/A criteria:** Mark inapplicable criteria as `- [ ] ~~text~~ N/A — reason`. Max 3 per WO.
+
 ### Provider Integration Rule
 
 The dev/ methodology does NOT control how provider config files are created. Providers should create their configs per their own recommendations. The dev init process then **injects** the context handoff section into the provider's existing config -- augmenting it, never replacing it.

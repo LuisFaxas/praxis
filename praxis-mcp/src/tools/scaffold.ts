@@ -84,14 +84,19 @@ export function registerScaffoldTool(server: McpServer): void {
 
   server.tool(
     "scaffold",
-    "Create the Praxis dev/ folder structure for a project. Detects the target tier and creates all required directories and template context documents. Safe to run multiple times — never overwrites existing files.",
+    "Create the Praxis dev/ folder structure for a project. Detects the target tier and creates all required directories and template context documents. Supports lane scaffolding for subproject organization. Safe to run multiple times — never overwrites existing files.",
     {
       project_path: z.string().optional().describe("Project root path. Defaults to PRAXIS_PROJECT_DIR env var."),
       tier: z.enum(["starter", "standard", "full"]).optional().default("starter").describe("Adoption tier determines which folders are created."),
       mode: z.enum(["solo", "triangle"]).optional().default("solo").describe("Operational mode."),
       agents: z.array(z.string()).optional().describe("Agent names for triangle mode WO folders (e.g., ['claude', 'codex', 'gemini'])."),
+      lanes: z.array(z.object({
+        prefix: z.string().describe("Two-digit prefix (e.g., '10')."),
+        type: z.enum(["delivery", "program", "lab", "ops"]).describe("Lane type."),
+        scope: z.string().describe("Lane scope name in snake_case (e.g., 'academy')."),
+      })).optional().describe("Lane definitions to scaffold under each agent."),
     },
-    async ({ project_path, tier, mode, agents }) => {
+    async ({ project_path, tier, mode, agents, lanes }) => {
       const projectPath = getProjectPath(project_path);
       const dev = resolveDevPath(projectPath);
       const today = todayISO();
@@ -103,12 +108,14 @@ export function registerScaffoldTool(server: McpServer): void {
       const devCreated = await ensureDir(dev);
       (devCreated ? created : alreadyExisted).push("dev/");
 
-      // Create tier-specific folders
+      // Create tier-specific folders (use _executed/ for new scaffolds)
       const folders = TIER_FOLDERS[tier] ?? TIER_FOLDERS.starter;
       for (const folder of folders) {
-        const fullPath = join(dev, folder);
+        // Map legacy "executed" to "_executed" for new scaffolds
+        const mappedFolder = folder === "work-orders/executed" ? "work-orders/_executed" : folder;
+        const fullPath = join(dev, mappedFolder);
         const wasCreated = await ensureDir(fullPath);
-        const label = `dev/${folder}/`;
+        const label = `dev/${mappedFolder}/`;
         (wasCreated ? created : alreadyExisted).push(label);
       }
 
@@ -116,11 +123,24 @@ export function registerScaffoldTool(server: McpServer): void {
       if (mode === "triangle" && agents && agents.length > 0) {
         for (const agent of agents) {
           const woDir = join(dev, "work-orders", `wo_${agent}`);
-          const executedDir = join(woDir, "executed");
+          const executedDir = join(woDir, "_executed");
           const woCreated = await ensureDir(woDir);
           const execCreated = await ensureDir(executedDir);
           (woCreated ? created : alreadyExisted).push(`dev/work-orders/wo_${agent}/`);
-          (execCreated ? created : alreadyExisted).push(`dev/work-orders/wo_${agent}/executed/`);
+          (execCreated ? created : alreadyExisted).push(`dev/work-orders/wo_${agent}/_executed/`);
+
+          // Create lanes under each agent
+          if (lanes && lanes.length > 0) {
+            for (const lane of lanes) {
+              const laneName = `${lane.prefix}_${lane.type}_${lane.scope}`;
+              const laneDir = join(woDir, laneName);
+              const laneExecDir = join(executedDir, laneName);
+              const laneCreated = await ensureDir(laneDir);
+              const laneExecCreated = await ensureDir(laneExecDir);
+              (laneCreated ? created : alreadyExisted).push(`dev/work-orders/wo_${agent}/${laneName}/`);
+              (laneExecCreated ? created : alreadyExisted).push(`dev/work-orders/wo_${agent}/_executed/${laneName}/`);
+            }
+          }
         }
       }
 
@@ -156,6 +176,7 @@ export function registerScaffoldTool(server: McpServer): void {
             message: "Praxis scaffold complete.",
             tier,
             mode,
+            lanes: lanes?.map(l => `${l.prefix}_${l.type}_${l.scope}`) ?? [],
             directoriesCreated: created,
             directoriesExisted: alreadyExisted,
             contextDocsCreated: docsCreated,

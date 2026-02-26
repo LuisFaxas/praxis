@@ -1,26 +1,38 @@
 #!/usr/bin/env node
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+// CLI subcommand routing: `npx praxis-mcp init` runs CLI init,
+// `npx praxis-mcp` (no args) starts the MCP server.
+const subcommand = process.argv[2];
 
-import { registerSessionTools } from "./tools/session.js";
-import { registerContextTools } from "./tools/context.js";
-import { registerWorkOrderTools } from "./tools/work-orders.js";
-import { registerLintTool } from "./tools/lint.js";
-import { registerScaffoldTool } from "./tools/scaffold.js";
+if (subcommand === "init") {
+  const { runInit } = await import("./cli-init.js");
+  await runInit(process.argv.slice(3));
+} else if (subcommand === "--version" || subcommand === "-v") {
+  console.log("praxis-mcp v1.1.0");
+} else {
+  // Default: start MCP server
+  const { McpServer } = await import("@modelcontextprotocol/sdk/server/mcp.js");
+  const { StdioServerTransport } = await import("@modelcontextprotocol/sdk/server/stdio.js");
 
-const server = new McpServer({
-  name: "praxis",
-  version: "1.0.0",
-});
+  const { registerSessionTools } = await import("./tools/session.js");
+  const { registerContextTools } = await import("./tools/context.js");
+  const { registerWorkOrderTools } = await import("./tools/work-orders.js");
+  const { registerLintTool } = await import("./tools/lint.js");
+  const { registerScaffoldTool } = await import("./tools/scaffold.js");
 
-// Register all tool categories
-registerSessionTools(server);
-registerContextTools(server);
-registerWorkOrderTools(server);
-registerLintTool(server);
-registerScaffoldTool(server);
+  const server = new McpServer({
+    name: "praxis",
+    version: "1.1.0",
+  });
 
-// Start the server with stdio transport
-const transport = new StdioServerTransport();
-await server.connect(transport);
+  // Register all tool categories
+  registerSessionTools(server);
+  registerContextTools(server);
+  registerWorkOrderTools(server);
+  registerLintTool(server);
+  registerScaffoldTool(server);
+
+  // Start the server with stdio transport
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+}

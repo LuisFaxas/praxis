@@ -148,6 +148,44 @@ Published to npm as `praxis-mcp` (v1.0.0). Registered via `.mcp.json` (Claude Co
 
 **First production deployment:** faxas.net portfolio app (Next.js 15, Triangle mode with Claude Code + Codex + Gemini).
 
+### v1.3.1 — Hardening (Feb 2026)
+
+**Release:** Upstream from portfolio pilot + MCP v1.1.0
+**Theme:** Battle-tested features from production to official
+
+The portfolio app served as a pilot for lane-based subproject organization, patch work orders, and centralized completion. After validating these patterns across 56 WOs and 4 lanes, the proven features were upstreamed to the official methodology and MCP server.
+
+**Methodology changes:**
+
+- **WO Lane System:** Organize work orders into typed subproject lanes (`{nn}_{type}_{scope}`). Four lane types: delivery, program, lab, ops. Program and lab lanes have relaxed validation.
+- **Centralized Completion:** Completed lane WOs move to `wo_{agent}/_executed/{lane}/` for a clean audit trail.
+- **Patch Work Orders:** `_P{NN}` suffix convention with parent metadata (Parent WO, Patch, Sequence Key).
+- **N/A Criteria:** `- [ ] ~~text~~ N/A — reason` format with 3 guardrails (reason required, max 3 per WO, prefer rewrite in active WOs).
+
+**praxis-mcp v1.1.0 (13 tools):**
+
+- Lane-aware scanning on all WO tools (list, read, create, complete)
+- New `create_patch_work_order` tool (12 → 13 tools)
+- N/A criteria treated as resolved in `complete_work_order`
+- `discoverLanes()` and `resolveExecutedDir()` reusable helpers
+- `_executed/` naming preference with `executed/` fallback
+- Lane scaffolding support in `scaffold` tool
+- `npx praxis-mcp init` CLI command for one-command scaffolding
+- `--version` flag support
+
+**praxis-lint v1.3.1:**
+
+- Upstreamed from pilot (1,021 → 1,356 lines)
+- Lane scanning with type-specific validation
+- Patch WO validation (parent exists, sequence integrity)
+- N/A criteria recognition (WO-012, WO-013)
+- Superseded WO handling
+- Line 442 bug fix (`unchecked` variable safety)
+
+**New documentation:**
+
+- [SECURITY.md](SECURITY.md) — security model for praxis-mcp (scope, path safety, concurrency, known ecosystem risks)
+
 ### Evolution Summary
 
 | Year | What Changed | How Work Was Done |
@@ -159,10 +197,11 @@ Published to npm as `praxis-mcp` (v1.0.0). Registered via `.mcp.json` (Claude Co
 | Feb 2026 (v1.1) | Public release | Methodology formalized, portable across projects |
 | Feb 2026 (v1.2) | praxis-lint | Convention enforcement automated (50 checks) |
 | Feb 2026 (v1.3) | praxis-mcp on npm | Methodology becomes callable tools — agents use it natively |
+| Feb 2026 (v1.3.1) | Hardening release | Lanes, patches, N/A criteria, CLI init, security model — battle-tested from pilot |
 
 ---
 
-## Current State (v1.3.0)
+## Current State (v1.3.1)
 
 ### What Works
 
@@ -170,27 +209,30 @@ Published to npm as `praxis-mcp` (v1.0.0). Registered via `.mcp.json` (Claude Co
 |-------|-----------|--------|
 | Methodology | Context chain (SOT + capsule + checkpoint) | Stable, battle-tested |
 | Methodology | Work order lifecycle (pending → executed) | Stable |
+| Methodology | WO Lane System (delivery/program/lab/ops) | New in v1.3.1, production-validated |
+| Methodology | Patch work orders (_P{NN} suffix) | New in v1.3.1, production-validated |
+| Methodology | N/A criteria (3 guardrails) | New in v1.3.1 |
 | Methodology | Four-stage pipeline (Research → Reports) | Stable |
 | Methodology | Provider init system (4 providers) | Stable |
 | Methodology | Adoption tiers (Lite / Standard / Enterprise) | Stable |
 | Methodology | Operating modes (Solo / Triangle as default topology) | Stable |
-| Enforcement | praxis-lint.sh (50 checks, 7 categories) | Stable |
-| Automation | praxis-mcp (12 tools, 5 categories) | Stable, published to npm |
+| Enforcement | praxis-lint.sh (50+ checks, 7 categories) | Stable, v1.3.1 (1,356 lines) |
+| Automation | praxis-mcp (13 tools, 5 categories) | Stable, v1.1.0 published to npm |
+| Automation | CLI init (`npx praxis-mcp init`) | New in v1.3.1 |
+| Security | SECURITY.md (threat model) | New in v1.3.1 |
 | Integration | Claude Code (.mcp.json) | Verified, production use |
 | Integration | Codex (config.toml) | Verified, MCP connected |
 | Integration | Gemini (init docs only, no MCP) | Documented |
-| Distribution | npm (`praxis-mcp@1.0.0`) | Published, installable |
+| Distribution | npm (`praxis-mcp@1.1.0`) | Published, installable |
 
 ### What's Missing
 
 | Gap | Impact | Notes |
 |-----|--------|-------|
-| Security model documentation | High | MCP security incidents are real; no threat model published |
-| Version pinning in examples | Medium | All docs show `npx praxis-mcp` without pinned version |
 | End-to-end example repo | High | Portfolio app is the reference implementation but not documented as such |
 | Concurrency conventions | Medium | Needs explicit guidance for same-provider parallel sessions and >3 agent graphs writing to shared files |
-| Cross-platform linting | Low | praxis-lint.sh requires bash (WSL on Windows) |
-| CHANGELOG.md | Low | Version history only in git tags and commits |
+| Cross-platform linting | Low | praxis-lint.sh requires bash (WSL on Windows); Node.js port planned for v1.4.0 |
+| CHANGELOG.md | Low | Version history only in git tags and ROADMAP.md |
 | Cursor/Windsurf init docs | Medium | Only Claude, Codex, Gemini supported |
 
 ### Production Deployments
@@ -272,27 +314,30 @@ Multi-agent file conflicts are a documented production problem. The industry con
 
 ## Future Roadmap
 
-### v1.4.0 — Hardening
+### v1.4.0 — Deep Hardening
 
-**Theme:** Security, stability, and trust
-**Priority:** HIGH — addresses the #1 adoption objection
-**Target:** Q1-Q2 2026
+**Theme:** Enforcement, cross-platform, and trust
+**Priority:** HIGH — completes the hardening arc started in v1.3.1
+**Target:** Q2 2026
 
 #### Deliverables
 
 | # | Item | Description |
 |---|------|-------------|
-| 1 | **SECURITY.md** | Threat model, safe defaults, what the server will never do, locked-mode operation, incident response process |
-| 2 | **Path sandboxing** | Strict allowlist in praxis-mcp: only operate under `$PRAXIS_PROJECT_DIR/dev` and `.praxis/` by default. Reject path traversal, symlink escape, and Unicode tricks |
-| 3 | **Shell injection hardening** | Audit and harden the `lint` tool's `child_process.execFile` call. Never pass unsanitized strings to shell |
-| 4 | **Version pinning in all docs** | Update every `npx praxis-mcp` reference to `npx praxis-mcp@1.0.0`. Add version pinning guidance section to README |
-| 5 | **CHANGELOG.md** | Formal changelog following Keep a Changelog format, covering v1.1 → v1.3 retroactively |
-| 6 | **Concurrency convention** | Document single-writer rule: "Only the session-closing agent writes to context chain files. Work orders are partitioned by agent (`wo_claude/`, `wo_codex/`)." |
-| 7 | **npm provenance attestation** | Enable npm provenance on publish for supply chain transparency |
+| 1 | **Path sandboxing** | Strict allowlist in praxis-mcp: only operate under `$PRAXIS_PROJECT_DIR/dev` and `.praxis/` by default. Reject path traversal, symlink escape, and Unicode tricks |
+| 2 | **Shell injection hardening** | Audit and harden the `lint` tool's `child_process.execFile` call. Never pass unsanitized strings to shell |
+| 3 | **Node.js linter port** | Rewrite praxis-lint.sh (1,356 lines of bash) in TypeScript. Eliminates bash dependency, enables cross-platform support (Windows without WSL), and allows deeper integration with the MCP server |
+| 4 | **CHANGELOG.md** | Formal changelog following Keep a Changelog format, covering v1.1 → v1.3.1 retroactively |
+| 5 | **npm provenance attestation** | Enable npm provenance on publish for supply chain transparency |
+| 6 | **Lint-enforced security rules** | Add security-focused lint checks: detect secrets in WOs, validate path references, flag unsafe command patterns |
 
-#### Why This First
+#### What shipped in v1.3.1
 
-The independent audit confirmed MCP security is the #1 concern skeptics will raise. Publishing a security model before pursuing new features demonstrates maturity and builds trust with potential adopters.
+The following items were originally planned for v1.4.0 but were pulled forward as lightweight gap-fills:
+- ~~SECURITY.md~~ — Shipped in v1.3.1
+- ~~Version pinning in docs~~ — All examples now pin to `@1.1.0`
+- ~~CLI installer~~ — `npx praxis-mcp init` shipped in v1.3.1
+- ~~Concurrency convention~~ — Documented in SECURITY.md single-writer rule
 
 ---
 

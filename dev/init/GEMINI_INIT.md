@@ -270,6 +270,12 @@ When the admin or Codex routes a question to Gemini, leverage the full codebase 
 12. **Verify before claiming** -- When unsure about a codebase claim, read the actual code. Do not assume based on file names or conventions alone.
 13. **Flag SOT contradictions immediately** -- If you find a critical mismatch between SOT and reality, note it in `dev/context_capsule.md` before continuing other work.
 
+### Lane & Patch Conventions (v1.3.1)
+
+- **WO Lanes:** Projects may organize WOs into typed lanes (e.g., `10_delivery_academy/`). Research WOs for Gemini may live in specific lanes.
+- **Centralized completion:** Lane WOs complete to `_executed/{lane}/`, not inside the lane.
+- **N/A criteria:** Mark inapplicable criteria as `- [ ] ~~text~~ N/A — reason`. Max 3 per WO.
+
 ### Provider Integration Rule
 
 The dev/ methodology does NOT control how provider config files are created. Providers should create their configs per their own recommendations. The dev init process then **injects** the context handoff section into the provider's existing config -- augmenting it, never replacing it.

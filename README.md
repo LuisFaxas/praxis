@@ -6,7 +6,7 @@
 
 From the Greek *πράσσω (prássō)* — "to do, to act, to practice."
 
-[![Version](https://img.shields.io/badge/version-1.3.0-7c3aed?style=for-the-badge)](https://github.com/luisfaxas/praxis)
+[![Version](https://img.shields.io/badge/version-1.3.1-7c3aed?style=for-the-badge)](https://github.com/luisfaxas/praxis)
 [![npm](https://img.shields.io/npm/v/praxis-mcp?style=for-the-badge&color=fe5000&label=npm)](https://www.npmjs.com/package/praxis-mcp)
 [![License](https://img.shields.io/badge/license-MIT-667eea?style=for-the-badge)](LICENSE)
 [![Provider](https://img.shields.io/badge/provider-agnostic-764ba2?style=for-the-badge)](#provider-integration)
@@ -362,12 +362,22 @@ This ensures the AI knows where to find the context chain on every new session, 
 
 ## Quick Start
 
-### 1. Scaffold the dev/ folder
+### Option A: CLI Init (Recommended)
+
+```bash
+npx praxis-mcp@1.1.0 init                                     # starter tier, solo mode
+npx praxis-mcp@1.1.0 init --tier full --mode triangle          # full tier, multi-agent
+npx praxis-mcp@1.1.0 init --tier standard --path ./my-project  # custom path
+```
+
+This creates the `dev/` folder structure, context documents, `.praxis/praxis-lint.sh`, and (in triangle mode) agent folders with `_executed/` directories. One command, fully scaffolded.
+
+### Option B: Manual Setup
 
 **Starter** (context chain + work orders only):
 
 ```bash
-mkdir -p dev/work-orders/executed
+mkdir -p dev/work-orders/_executed
 ```
 
 Then create `dev/source_of_truth.md`, `dev/context_capsule.md`, and `dev/checkpoint.md`.
@@ -375,22 +385,16 @@ Then create `dev/source_of_truth.md`, `dev/context_capsule.md`, and `dev/checkpo
 **Full** (complete governance layer):
 
 ```bash
-mkdir -p dev/{init,research/{active,archive},planning/master-plan/{draft,approved},work-orders/executed,commands/{active,executed},audit/{current,legacy},reports/{draft/{html,written},published/{html,written}},design/{audit/screenshots,language,resources},archive}
+mkdir -p dev/{init,research/{active,archive},planning/master-plan/{draft,approved},work-orders/_executed,commands/{active,executed},audit/{current,legacy},reports/{draft/{html,written},published/{html,written}},design/{audit/screenshots,language,resources},archive,private}
 ```
 
-### 2. Initialize context documents
-
-Copy the templates for `source_of_truth.md`, `context_capsule.md`, and `checkpoint.md` from this repo's `dev/` folder into your project's `dev/` folder.
-
-### 3. Copy the init file for your provider
+### Configure your provider
 
 Copy the relevant init file from `dev/init/` into your project. For Claude Code:
 
 ```bash
 cp dev/init/CLAUDE_INIT.md your-project/dev/init/
 ```
-
-### 4. Run init
 
 Paste the contents of your provider's init file into a new session. The AI will:
 - Read your codebase
@@ -417,6 +421,92 @@ You're now running Praxis.
 
 ---
 
+## WO Lane System
+
+Lanes organize work orders into subproject scopes within an agent folder. They're optional — projects without lanes work identically to v1.2.
+
+### Lane Naming
+
+```
+{nn}_{type}_{scope}
+```
+
+- **nn** — Two-digit prefix for ordering (10, 20, 30...)
+- **type** — One of: `delivery`, `program`, `lab`, `ops`
+- **scope** — Snake_case description (e.g., `academy`, `site_core`)
+
+Example: `10_delivery_academy`, `70_program_methodology_rewrite`, `80_lab_experimental_design`
+
+### Lane Types
+
+| Type | Purpose | Validation |
+|------|---------|------------|
+| `delivery` | Shippable product work | Full: Acceptance Criteria + Status required |
+| `program` | Planning and methodology | Relaxed: criteria and status optional |
+| `lab` | Experimental and research | Relaxed: criteria and status optional |
+| `ops` | Operational and infrastructure | Full: Acceptance Criteria + Status required |
+
+### Centralized Completion
+
+When a WO in a lane is completed, it moves to a centralized `_executed/` directory:
+
+```
+wo_claude/
+├── 10_delivery_academy/           # Active WOs
+├── 20_delivery_site_core/         # Active WOs
+└── _executed/
+    ├── 10_delivery_academy/       # Completed WOs from this lane
+    └── 20_delivery_site_core/     # Completed WOs from this lane
+```
+
+This keeps the active queue clean while preserving a lane-organized audit trail.
+
+---
+
+## Patch Work Orders
+
+Patch WOs extend a completed parent WO to address follow-up issues. They use the `_P{NN}` suffix convention:
+
+```
+5_2026-02-22_ORIGINAL_TASK.md          # Parent (in _executed/)
+5_2026-02-22_FIX_HEADER_BUG_P01.md     # Patch 1
+5_2026-02-23_ADD_MOBILE_SUPPORT_P02.md  # Patch 2
+```
+
+### Required Metadata
+
+Every patch WO includes parent tracking fields:
+
+```markdown
+- **Parent WO:** 5
+- **Patch:** P01
+- **Sequence Key:** 5.01
+```
+
+The sequence key (`{parent}.{patch}`) enables chronological ordering across parent + patches.
+
+---
+
+## N/A Criteria
+
+When an acceptance criterion becomes inapplicable after the WO was scoped, mark it as N/A:
+
+```markdown
+- [ ] ~~Criterion text~~ N/A — reason the criterion doesn't apply
+```
+
+The checkbox stays `[ ]`, the text is wrapped in strikethrough (`~~`), and a reason follows the em dash.
+
+### Guardrails
+
+| Rule | Scope | Severity |
+|------|-------|----------|
+| Reason required | All WOs | N/A without reason = doesn't match, counts as unchecked |
+| Max 3 per WO | Executed WOs | >3 N/A = FAIL (WO is poorly scoped) |
+| Prefer rewrite | Active WOs | N/A in active WO = WARN (rewrite the criterion instead) |
+
+---
+
 ## Security & Sensitive Data
 
 Praxis is designed to live in Git repositories. These rules prevent accidental exposure:
@@ -426,6 +516,8 @@ Praxis is designed to live in Git repositories. These rules prevent accidental e
 - **The `.gitignore` matters.** Praxis ships with a `.gitignore` that excludes common secret patterns. Extend it for your project.
 - **Sensitive artifacts go in `dev/private/`.** Use it for contracts, credential references, internal notes with PII, or any document that should exist in the project context but never in version control. Add `dev/private/` to your project's `.gitignore`. Reference private docs from the source of truth by path (e.g., "credentials in `dev/private/server_creds.md`").
 - **Command documents deserve extra scrutiny.** Command docs in `commands/active/` may contain connection strings, server addresses, or credentials. Review before committing to git.
+
+For the MCP server security model (path safety, concurrency, known risks), see [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -557,7 +649,7 @@ But there's a better way.
 
 **The MCP server turns Praxis from rules you follow into tools you use.** Instead of the AI parsing instructions from `CLAUDE_INIT.md` and manually opening files in the right order, it calls `session_start` and gets the entire project state in a single structured response. Instead of manually constructing work order markdown and remembering the naming convention, it calls `create_work_order` and the file appears — correctly numbered, correctly dated, correctly formatted, in the correct folder.
 
-This is what the [Model Context Protocol](https://modelcontextprotocol.io/) was designed for: giving AI agents structured access to external systems. The Praxis MCP server wraps the entire methodology into 12 native tools that any MCP-compatible AI can call automatically.
+This is what the [Model Context Protocol](https://modelcontextprotocol.io/) was designed for: giving AI agents structured access to external systems. The Praxis MCP server wraps the entire methodology into 13 native tools that any MCP-compatible AI can call automatically.
 
 ### Before & After
 
@@ -573,7 +665,7 @@ This is what the [Model Context Protocol](https://modelcontextprotocol.io/) was 
 
 The AI doesn't need to be told *how* to follow Praxis. It calls the tools, and the tools enforce the methodology.
 
-### The Tool Inventory (12 Tools, 5 Categories)
+### The Tool Inventory (13 Tools, 5 Categories)
 
 <details>
 <summary><b>Session Lifecycle</b> — start, end, and detect (click to expand)</summary>
@@ -598,14 +690,15 @@ The AI doesn't need to be told *how* to follow Praxis. It calls the tools, and t
 </details>
 
 <details>
-<summary><b>Work Orders</b> — list, read, create, complete (click to expand)</summary>
+<summary><b>Work Orders</b> — list, read, create, complete, patch (click to expand)</summary>
 
 | Tool | What It Does |
 |------|-------------|
-| **`list_work_orders`** | Lists all work orders with parsed metadata (number, title, status, priority, assigned agent). Handles both Solo and Triangle mode folder structures. Supports filtering by status and agent. |
-| **`read_work_order`** | Reads a specific work order by number or filename. Returns parsed header fields plus criteria completion state (X of Y checked). Works across all agent folders in Triangle mode. |
-| **`create_work_order`** | Creates a new work order with full naming convention enforcement. Auto-numbers (scans for the highest existing number + 1), auto-dates, renders the standard WO template, and routes to the correct folder (`wo_claude/`, `wo_gemini/`, or flat queue). |
-| **`complete_work_order`** | Validates that all acceptance criteria are checked (`- [x]`), then updates the status to "Complete" and moves the file to `executed/`. If any criteria are unchecked, the tool **rejects the completion** and returns the list of unfinished items. Quality gate, enforced. |
+| **`list_work_orders`** | Lists all work orders with parsed metadata (number, title, status, priority, assigned agent, lane). Handles Solo, Triangle, and lane-based folder structures. Supports filtering by status, agent, and lane. |
+| **`read_work_order`** | Reads a specific work order by number or filename. Returns parsed header fields, criteria completion state, N/A criteria count, and patch metadata. Searches across lanes and executed directories. |
+| **`create_work_order`** | Creates a new work order with full naming convention enforcement. Auto-numbers, auto-dates, renders the standard WO template, and routes to the correct folder — including lane subfolders. |
+| **`complete_work_order`** | Validates that all acceptance criteria are checked or marked N/A, then updates status to "Complete" and moves to the correct `_executed/` path (centralized for lanes, flat for top-level). N/A criteria are treated as resolved. |
+| **`create_patch_work_order`** | Creates a patch WO extending an existing parent. Auto-assigns the next `_P{NN}` suffix, includes parent metadata (Parent WO, Patch, Sequence Key), and routes to the correct lane. |
 
 </details>
 
@@ -623,7 +716,7 @@ The AI doesn't need to be told *how* to follow Praxis. It calls the tools, and t
 
 | Tool | What It Does |
 |------|-------------|
-| **`scaffold`** | Creates the complete `dev/` folder structure based on tier (starter/standard/full), mode (solo/triangle), and agent list. Also creates template context documents (SOT, capsule, checkpoint) if they don't exist. Safe to run multiple times — reports what was created vs. what already existed. |
+| **`scaffold`** | Creates the complete `dev/` folder structure based on tier (starter/standard/full), mode (solo/triangle), agent list, and optional lane definitions. Creates centralized `_executed/` directories and template context documents. Safe to run multiple times — reports what was created vs. what already existed. |
 
 </details>
 
@@ -684,19 +777,22 @@ Tools appear as `mcp__praxis__session_start`, `mcp__praxis__create_work_order`, 
 ```
 praxis-mcp/
 ├── src/
-│   ├── index.ts              # McpServer + stdio transport
+│   ├── index.ts              # CLI routing + McpServer + stdio transport
+│   ├── cli-init.ts           # npx praxis-mcp init command
 │   ├── tools/                # One file per category
 │   │   ├── session.ts        # session_start, session_end, detect_project
 │   │   ├── context.ts        # read_context, update_capsule, update_checkpoint
-│   │   ├── work-orders.ts    # list, read, create, complete
+│   │   ├── work-orders.ts    # list, read, create, complete, create_patch
 │   │   ├── lint.ts           # Spawns praxis-lint.sh
-│   │   └── scaffold.ts       # TypeScript mkdir by tier/mode
+│   │   └── scaffold.ts       # TypeScript mkdir by tier/mode/lanes
 │   └── lib/                  # Shared utilities
-│       ├── constants.ts      # Tier folder maps, WO template, naming regex
-│       ├── fs-helpers.ts     # Safe file I/O, age checks, directory listing
+│       ├── constants.ts      # Tier maps, WO/patch templates, lane/naming regex
+│       ├── fs-helpers.ts     # Safe file I/O, lane discovery, executed resolution
 │       ├── detection.ts      # Tier, mode, and provider detection
-│       ├── parsers.ts        # WO, capsule, checkpoint, SOT parsers
-│       └── naming.ts         # Auto-numbering, filename formatting
+│       ├── parsers.ts        # WO (with N/A + patch), capsule, checkpoint, SOT
+│       └── naming.ts         # Auto-numbering, patch suffixes, filename formatting
+├── templates/                # Bundled for CLI init
+│   └── praxis-lint.sh        # Linter v1.3.1
 └── build/                    # Compiled JS (gitignored)
 ```
 
@@ -749,7 +845,7 @@ Praxis bridges two worlds:
 
 The result is a methodology where humans and AI agents collaborate as equals, each compensating for the other's limitations. AI has unlimited patience and processing power but no persistent memory. Humans have institutional knowledge and decision authority but limited bandwidth. Praxis gives both sides a shared workspace where context persists, work is tracked, and nothing gets lost.
 
-The evolution tells the story: **v1.1** gave AI agents structured folders and markdown documents to follow. **v1.2** added `praxis-lint` — 50 automated checks that enforce the rules. **v1.3** added the MCP server — 12 native tools that turn the methodology into something the AI doesn't just follow, but *calls.* Session start, work order creation, context updates, quality gates — all as native tool calls that any MCP-compatible AI invokes automatically.
+The evolution tells the story: **v1.1** gave AI agents structured folders and markdown documents to follow. **v1.2** added `praxis-lint` — 50 automated checks that enforce the rules. **v1.3** added the MCP server — native tools that turn the methodology into something the AI doesn't just follow, but *calls.* **v1.3.1** hardened the entire stack: lane-based subproject organization, patch work orders, N/A criteria recognition, a CLI installer, and a security model — all battle-tested on a real multi-agent project before upstream.
 
 The filesystem is the foundation. The linter is the guardrails. **The MCP server is the interface.** Together, they make Praxis the first AI development methodology that governs itself.
 

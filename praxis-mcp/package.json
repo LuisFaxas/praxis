@@ -1,7 +1,7 @@
 {
   "name": "praxis-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for the Praxis AI development methodology — 12 structured tools for session management, work orders, context chain, validation, and scaffolding.",
+  "version": "1.1.0",
+  "description": "MCP server for the Praxis AI development methodology — 13 structured tools for session management, work orders, context chain, validation, and scaffolding.",
   "type": "module",
   "bin": {
     "praxis-mcp": "build/index.js"
@@ -10,6 +10,7 @@
     "build/**/*.js",
     "build/**/*.d.ts",
     "build/**/*.js.map",
+    "templates/**",
     "README.md"
   ],
   "scripts": {
